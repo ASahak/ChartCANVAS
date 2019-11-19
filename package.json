@@ -8,6 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
+  "dependencies": {
+    "dat.gui": "^0.7.6"
+  },
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.3",
