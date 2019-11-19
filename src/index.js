@@ -1,3 +1,4 @@
+import * as dat from 'dat.gui';
 require('./styles/style.css');
 const canvas = document.querySelector('#chart');
 const _dataChart = {
@@ -29,7 +30,7 @@ const _dataChart = {
         { value: 27000000, text: 'Australia'},
     ]
 }
-function Chart (selector) {
+function ChartArt (selector) {
     const self              = this;
     this._result            = null;
     this._canvas            = selector.getContext('2d');
@@ -41,36 +42,81 @@ function Chart (selector) {
         }
     }
 
-    // Bar Chart ******************
+    /***************Bar Chart ******************/
     function Bar (options) {
+        this._gui = new dat.GUI();
+        const barFolder = this._gui.addFolder('Bar')
         this._configuration = options
+        this._strockeColor = {
+            h: 200,
+            s: 50,
+            l: 50
+        }
+        self._borderColor = [175, 160, 160]
+        barFolder.addColor(self, '_borderColor').onChange(() => {
+            console.log(self._borderColor)
+        })
+        barFolder.add(self, '_borderOpacity', 0, 1)
+        // const strockeFolder = this._gui.addFolder('Stroke')
+        // strockeFolder.add(this._strockeColor, 'h', 0, 255)
+        // strockeFolder.add(this._strockeColor, 's', 0, 255)
+        // strockeFolder.add(this._strockeColor, 'l', 0, 255)
     }
     Bar.prototype.__setAxisYLine = function () {
         self._canvas.beginPath();
-        self._canvas.translate(0.5,0.5),
+        self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
+        let _heightAxis = null
+        if (self._labelsX.hasOwnProperty('fontSize')) {
+            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
+        }
         self._lineYWidth && (
-            self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - self._paddingXBottom),
+            self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - _heightAxis),
             self._canvas.lineTo(self._paddingYLeft, self._paddingXTop),
             self._canvas.lineWidth = self._lineYWidth
         )
         if (self._borderColor instanceof Array) {
-            self._canvas.strokeStyle = self._result.__drawLine(self._paddingYLeft, self._heightCanvas - self._paddingXBottom, self._paddingYLeft, self._paddingXTop, self._borderColor)
+            self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
         } else {
-            console.log(self._borderColor)
+            self._canvas.strokeStyle = self._borderColor
+        }
+        self._canvas.stroke()
+    }
+    Bar.prototype.__setAxisXLine = function () {
+        self._canvas.beginPath();
+        let _heightAxis = null
+        if (self._labelsX.hasOwnProperty('fontSize')) {
+            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
+        }
+        self._lineXWidth && (
+            self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - _heightAxis),
+            self._canvas.lineTo(self._widthCanvas - self._paddingYRight, self._heightCanvas - _heightAxis),
+            self._canvas.lineWidth = self._lineYWidth
+        )
+        if (self._borderColor instanceof Array) {
+            self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
+        } else {
             self._canvas.strokeStyle = self._borderColor
         }
         self._canvas.stroke()
     }
     Bar.prototype.__setAxisY = function () {
         let _values = this._configuration.data.datasets.data.map(_ => _.value)
-        console.log(this._configuration, Math.max(..._values))
+        // console.log(this._configuration, Math.max(..._values))
         this.__setAxisYLine()
     }
     Bar.prototype.__setAxisX = function () {
-        self._canvas.font = '14px Arial';
-        self._canvas.fillStyle = '0,0,0';
+        this.__setAxisXLine()
+        let _heightAxis = null
+        if (self._labelsX.hasOwnProperty('fontSize')) {
+            self._canvas.font = self._labelsX.fontSize+'px Arial';
+            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
+        }
+        let _canvasBadgeWidth = (self._widthCanvas - (self._paddingYLeft + self._paddingYRight)) / this._configuration.data.labels.length
         this._configuration.data.labels.forEach((_, index) => {
-            self._canvas.fillText(_, index * 100 + 100, self._heightCanvas)
+            self._canvas.strokeStyle = 'grey'
+            self._canvas.strokeRect((index * _canvasBadgeWidth + self._paddingYLeft), self._heightCanvas - _heightAxis, _canvasBadgeWidth, _heightAxis)
+            self._canvas.textAlign = "center";
+            self._canvas.fillText(_, (index * _canvasBadgeWidth + self._paddingYLeft) + (_canvasBadgeWidth/2), self._heightCanvas - ((_heightAxis - 10) / 2))
         })
     }
     Bar.prototype.__draw = function () {
@@ -79,12 +125,24 @@ function Chart (selector) {
     }
     Bar.prototype.__init = function () {
         setTimeout(() => {
-            this.__draw()
+            this.__animate()
         }, 0)
+    }
+    Bar.prototype.__update = function () {
+        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas)
+        this.__draw()
+    }
+    Bar.prototype.__animate = function () {
+        requestAnimationFrame(this.__animate.bind(this))
+        this.__update()
     }
     // ****************************
 
     /******************HELPERS***********/
+    Result.prototype.__maxValue = function (nest) {
+        console.log(nest)
+    }
+    /********** ONLY FOR TRANSPARENT COLOR************
     Result.prototype.__drawLine = function (xMoveTo, yMoveTo, xLineTo, yLineTo, dataColor) {
         const gradient = self._canvas.createLinearGradient(xMoveTo, yMoveTo, xLineTo, yLineTo);
         let grow = 1 / (dataColor.length - 1);
@@ -92,10 +150,10 @@ function Chart (selector) {
             gradient.addColorStop( grow * index, _);
         })
         return gradient
-    }
+    }*/
     /*_________________________________*/
 
-    Result.prototype.init = function (parameters) {
+    Result.prototype.__init = function (parameters) {
         selector.width                = self._widthCanvas;
         selector.height               = self._heightCanvas;
         self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
@@ -105,31 +163,50 @@ function Chart (selector) {
         self._lineYWidth              = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
         self._lineXWidth              = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
         self._borderColor             = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || '#000';
+        self._borderOpacity           = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
+        self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
+        self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
         self._result = new Result(selector, parameters);
+        [{
+            nesting: ['options', 'scales', 'tricks', 'fontSize'],
+            value: 25
+        }].forEach(_ => self._result.__maxValue(_))
         return self._result[parameters.type]
     }
     return new Result(selector)
 }
-Chart(canvas).init({
+new ChartArt(canvas).__init({
     type: 'bar',
     data: {
         labels: _dataChart['2019'].map(_ => _.text),
         datasets: {
             data: _dataChart['2019'],
-            borderColor: ['red', 'blue']
+            borderColor: [175, 160, 160],
+            borderOpacity: 1
         }
     },
     options: {
         padding: {
             paddingLeft: 30,
-            paddingBottom: 30
+            paddingRight: 30,
+            paddingBottom: 10
         },
         scales: {
             yAxis: {
-                lineWidth: 1
+                lineWidth: 1,
+                tricks: {
+                    labels: {
+                        fontSize: 14
+                    }
+                }
             },
             xAxis: {
-                lineWidth: 1
+                lineWidth: 1,
+                tricks: {
+                    labels: {
+                        fontSize: 15
+                    }
+                }
             }
         }
     }
