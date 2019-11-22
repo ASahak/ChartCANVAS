@@ -3094,27 +3094,22 @@ function ChartArt (selector) {
         this._gui = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
         const barFolder = this._gui.addFolder('Bar')
         this._configuration = options
-        this._strockeColor = {
-            h: 200,
-            s: 50,
-            l: 50
-        }
+        this._strockeColor = [200, 50, 50]
         self._borderColor = [175, 160, 160]
         barFolder.addColor(self, '_borderColor').onChange(() => {
             console.log(self._borderColor)
         })
         barFolder.add(self, '_borderOpacity', 0, 1)
+        barFolder.add(self._labelsX, 'fontSize', 10, 26)
+        barFolder.addColor(self._labelsX, 'color')
         // const strockeFolder = this._gui.addFolder('Stroke')
-        // strockeFolder.add(this._strockeColor, 'h', 0, 255)
-        // strockeFolder.add(this._strockeColor, 's', 0, 255)
-        // strockeFolder.add(this._strockeColor, 'l', 0, 255)
     }
     Bar.prototype.__setAxisYLine = function () {
         self._canvas.beginPath();
         self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
         let _heightAxis = null
         if (self._labelsX.hasOwnProperty('fontSize')) {
-            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
+            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize * 2
         }
         self._lineYWidth && (
             self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - _heightAxis),
@@ -3132,7 +3127,7 @@ function ChartArt (selector) {
         self._canvas.beginPath();
         let _heightAxis = null
         if (self._labelsX.hasOwnProperty('fontSize')) {
-            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
+            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize * 2
         }
         self._lineXWidth && (
             self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - _heightAxis),
@@ -3140,7 +3135,7 @@ function ChartArt (selector) {
             self._canvas.lineWidth = self._lineYWidth
         )
         if (self._borderColor instanceof Array) {
-            self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
+                self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
         } else {
             self._canvas.strokeStyle = self._borderColor
         }
@@ -3153,17 +3148,12 @@ function ChartArt (selector) {
     }
     Bar.prototype.__setAxisX = function () {
         this.__setAxisXLine()
-        let _heightAxis = null
-        if (self._labelsX.hasOwnProperty('fontSize')) {
-            self._canvas.font = self._labelsX.fontSize+'px Arial';
-            _heightAxis = (self._labelsX.fontSize < self._paddingXBottom) ? self._paddingXBottom : self._labelsX.fontSize + 5
-        }
+        self._canvas.font = self._labelsX.fontSize + 'px Arial';
         let _canvasBadgeWidth = (self._widthCanvas - (self._paddingYLeft + self._paddingYRight)) / this._configuration.data.labels.length
         this._configuration.data.labels.forEach((_, index) => {
-            self._canvas.strokeStyle = 'grey'
-            self._canvas.strokeRect((index * _canvasBadgeWidth + self._paddingYLeft), self._heightCanvas - _heightAxis, _canvasBadgeWidth, _heightAxis)
             self._canvas.textAlign = "center";
-            self._canvas.fillText(_, (index * _canvasBadgeWidth + self._paddingYLeft) + (_canvasBadgeWidth/2), self._heightCanvas - ((_heightAxis - 10) / 2))
+            self._canvas.fillText(self._result.__fittingString(self._canvas, _, _canvasBadgeWidth - 10), (index * _canvasBadgeWidth + self._paddingYLeft) + (_canvasBadgeWidth/2), self._heightCanvas - (((self._labelsX.fontSize * 2) - (self._labelsX.fontSize * 2) / 3) / 2))
+            self._canvas.fillStyle = self._labelsX.color
         })
     }
     Bar.prototype.__draw = function () {
@@ -3176,7 +3166,7 @@ function ChartArt (selector) {
         }, 0)
     }
     Bar.prototype.__update = function () {
-        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas)
+        self._result.__maxValueInit(this._configuration)
         this.__draw()
     }
     Bar.prototype.__animate = function () {
@@ -3186,8 +3176,52 @@ function ChartArt (selector) {
     // ****************************
 
     /******************HELPERS***********/
-    Result.prototype.__maxValue = function (nest) {
-        console.log(nest)
+    Result.prototype.__fittingString = function (c, str, maxWidth) {
+        var width = c.measureText(str).width;
+        var ellipsis = '…';
+        var ellipsisWidth = c.measureText(ellipsis).width;
+        if (width<=maxWidth || width<=ellipsisWidth) {
+            return str;
+        } else {
+            var len = str.length;
+            while (width>=maxWidth-ellipsisWidth && len-->0) {
+                str = str.substring(0, len);
+                width = c.measureText(str).width;
+            }
+            return str+ellipsis;
+        }
+    }
+    Result.prototype.__maxValueInit = function (options) {
+        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+        [{
+            nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
+            value: 16,
+            emptyProperty: 13
+        }, {
+            nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
+            value: 16,
+            emptyProperty: 13
+        }].forEach(_ => self._result.__maxValue(_, options))
+    }
+    Result.prototype.__maxValue = function (nest, options) {
+        let res;
+        nest.nesting.forEach((_, index) => {
+            if (index < nest.nesting.length - 1){
+                try {
+                    res = options[_]
+                    options = res
+                } catch (err) {
+                    options = res
+                }
+            } else {
+                let _last = nest.nesting.pop()
+                if (!res.hasOwnProperty(_)) {
+                    res[_] = nest.emptyProperty
+                } else if (res instanceof Object) {
+                    options[_last] = (options[_last] > nest.value) ? nest.value : res[_last]
+                }
+            }
+        })
     }
     /********** ONLY FOR TRANSPARENT COLOR************
     Result.prototype.__drawLine = function (xMoveTo, yMoveTo, xLineTo, yLineTo, dataColor) {
@@ -3214,10 +3248,6 @@ function ChartArt (selector) {
         self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
         self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
         self._result = new Result(selector, parameters);
-        [{
-            nesting: ['options', 'scales', 'tricks', 'fontSize'],
-            value: 25
-        }].forEach(_ => self._result.__maxValue(_))
         return self._result[parameters.type]
     }
     return new Result(selector)
@@ -3243,7 +3273,8 @@ new ChartArt(canvas).__init({
                 lineWidth: 1,
                 tricks: {
                     labels: {
-                        fontSize: 14
+                        fontSize: 13,
+                        color: 'rgb(35,32,32)'
                     }
                 }
             },
@@ -3251,7 +3282,8 @@ new ChartArt(canvas).__init({
                 lineWidth: 1,
                 tricks: {
                     labels: {
-                        fontSize: 15
+                        fontSize: 13,
+                        color: 'rgb(35,32,32)'
                     }
                 }
             }
