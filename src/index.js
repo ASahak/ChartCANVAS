@@ -29,6 +29,10 @@ const _dataChart = {
         { value: 769000000, text: 'Europa'},
         { value: 27000000, text: 'Australia'},
     ]
+};
+const _legendInfo = {
+    info1: null,
+    info2: 2019,
 }
 function ChartArt (selector) {
     const self              = this;
@@ -163,28 +167,40 @@ function ChartArt (selector) {
         ];
         let maxCeil = Math.ceil(Number(_maxValue.toString().split('')[0] + (_maxValue.toString().split('')[1] | _maxValue.toString().split('')[1]))/10);
         if (self._labelsY.display) {
+            console.log(maxCeil)
             if (_maxValue > 999999999999 || _maxValue === Infinity) {
                 maxCeil *= 10000;
+                _legendInfo.info1 = 'x10000000'
             } else if (_maxValue > 999999999) {
                 maxCeil *= 1000;
+                _legendInfo.info1 = 'x1000000'
             } else if (_maxValue > 99999999) {
                 maxCeil *= 100;
+                _legendInfo.info1 = 'x1000000'
             } else if (_maxValue > 9999999) {
                 maxCeil *= 10;
+                _legendInfo.info1 = 'x1000000'
             } else if (_maxValue > 999999) {
                 maxCeil *= 1;
+                _legendInfo.info1 = 'x1000000'
             } else if (_maxValue > 99999) {
                 maxCeil *= 100;
+                _legendInfo.info1 = 'x1000'
             } else if (_maxValue > 9999) {
                 maxCeil *= 10;
+                _legendInfo.info1 = 'x1000'
             } else if (_maxValue > 999) {
                 maxCeil *= 1;
+                _legendInfo.info1 = 'x1000'
             } else if (_maxValue > 99) {
                 maxCeil *= 100;
+                _legendInfo.info1 = 'x1'
             } else if (_maxValue > 9) {
                 maxCeil *= 10;
+                _legendInfo.info1 = 'x1'
             } else {
                 maxCeil *= 1;
+                _legendInfo.info1 = 'x1'
             }
         }
         let nextVal = maxCeil
@@ -307,11 +323,22 @@ function ChartArt (selector) {
             self._canvas.closePath();
         })
     }
+    Bar.prototype.__setLegend = function (percpective) {
+        self._canvas.textAlign = "left";
+        self._canvas.fillStyle = self._labelsX.color;
+        self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`, (() => {
+            let text = 'Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`
+            let widthTxt = self._canvas.measureText(text).width
+            return (self._widthCanvas / 2  - widthTxt / 2)
+        })(), 10)
+        self._canvas.clearColor;
+    }
     Bar.prototype.__draw = function () {
         this.__beforeChanging();
         this.__setAxisX(self._labelsX.display);
         this.__setAxisY(self._labelsX.display, self._labelsY.display);
         this.__setCoordinatesNet(self._labelsY.display);
+        this.__setLegend(_legendInfo.info1);
         this.__drawBars(this.animateBars)
     }
     Bar.prototype.__init = function () {
@@ -441,9 +468,9 @@ function ChartArt (selector) {
 new ChartArt(canvas).__init({
     type: 'bar',
     data: {
-        labels: _dataChart['2019'].map(_ => _.text),
+        labels: _dataChart[_legendInfo.info2].map(_ => _.text),
         datasets: {
-            data: _dataChart['2019'],
+            data: _dataChart[_legendInfo.info2],
             borderColor: [175, 160, 160],
             borderOpacity: 1
         }
