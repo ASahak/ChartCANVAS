@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "#chart{\r\n    border:1px solid #000;\r\n}", ""]);
+exports.push([module.i, "#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    transition: all cubic-bezier(.075,.82,.165,1) .1s;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
 
 
 /***/ }),
@@ -3089,18 +3089,19 @@ function ChartArt (selector) {
     this._widthCanvas       = 800;
     function Result (elem, options) {
         if (options) {
-            this.bar = new Bar(options).__init();
+            this.bar = new Bar(options);
+            this.bar.__init();
         }
     }
 
     /***************Bar Chart ******************/
     function Bar (options) {
+        this._barsPositions = {};
         this._gui = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
-        const barFolder = this._gui.addFolder('Bar')
-        this._configuration = options
-        this.animateBars = false
-        this._strockeColor = [200, 50, 50]
-        self._borderColor = [175, 160, 160]
+        const barFolder = this._gui.addFolder('Bar');
+        this._configuration = options;
+        this.animateBars = false;
+        self._borderColor = [175, 160, 160];
         barFolder.addColor(self, '_borderColor')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
@@ -3109,10 +3110,15 @@ function ChartArt (selector) {
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
-        barFolder.add(self._bars, 'width', 20, 60)
-        .onChange(() => {
-            requestAnimationFrame(this.__animate.bind(this))
-        });
+        const _bars = barFolder.addFolder('bars');
+        _bars.add(self._bars, 'width', 20, 60)
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            });
+        _bars.add(self, '_barTooltip')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            });
 
         // Sub Folders
         const xAxis = barFolder.addFolder('xAxis')
@@ -3150,6 +3156,11 @@ function ChartArt (selector) {
             requestAnimationFrame(this.__animate.bind(this))
         })
             .domElement.parentElement.setAttribute('style', `pointer-events: ${self._labelsY.display ? 'auto' : 'none'}; opacity: ${self._labelsY.display ? 1 : 0.5}`);
+        const legendBar = barFolder.addFolder('Legend');
+        legendBar.add(self, '_legend')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            })
         barFolder.open()
     }
     Bar.prototype.__setAxisYLine = function (_displayX) {
@@ -3177,7 +3188,7 @@ function ChartArt (selector) {
     Bar.prototype.__setAxisXLine = function (_display) {
         self._canvas.beginPath();
         self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
-        self._paddingXBottom = self._labelsX.display ? self._paddingXBottom: 10
+        self._paddingXBottom = self._labelsX.display ? self._paddingXBottom: 10;
         let _heightAxis = null;
         if (self._labelsX.hasOwnProperty('fontSize') && _display) {
             _heightAxis = self._labelsX.fontSize * 2;
@@ -3203,7 +3214,7 @@ function ChartArt (selector) {
             self._canvas.font = self._labelsY.fontSize + 'px Arial';
             self._canvas.textAlign = "right";
             self._canvas.fillStyle = self._labelsY.color;
-            self._canvas.fillText('0', self._paddingYLeft - 7, self._heightCanvas - self._paddingXBottom)
+            self._canvas.fillText('0', self._paddingYLeft - 7, self._heightCanvas - self._paddingXBottom);
             self._canvas.clearColor;
         }
     }
@@ -3214,7 +3225,6 @@ function ChartArt (selector) {
         ];
         let maxCeil = Math.ceil(Number(_maxValue.toString().split('')[0] + (_maxValue.toString().split('')[1] | _maxValue.toString().split('')[1]))/10);
         if (self._labelsY.display) {
-            console.log(maxCeil)
             if (_maxValue > 999999999999 || _maxValue === Infinity) {
                 maxCeil *= 10000;
                 _legendInfo.info1 = 'x10000000'
@@ -3253,10 +3263,10 @@ function ChartArt (selector) {
         let nextVal = maxCeil
         for (let i = 1; i < 10; i++) {
             self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
-            self._canvas.beginPath()
+            self._canvas.beginPath();
             self._canvas.moveTo(self._paddingYLeft - 5, i * (self._heightCanvas - self._paddingXBottom - self._paddingXTop) / 10 + self._paddingXTop)
             self._canvas.lineTo(self._widthCanvas - self._paddingYRight, i * (self._heightCanvas - self._paddingXBottom - self._paddingXTop) / 10 + self._paddingXTop)
-            self._canvas.lineWidth = self._lineXWidth
+            self._canvas.lineWidth = self._lineXWidth;
             if (self._borderColor instanceof Array) {
                 self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
             } else {
@@ -3276,7 +3286,7 @@ function ChartArt (selector) {
         }
         for (let i = 1; i < this._configuration.data.labels.length; i++) {
             self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
-            self._canvas.beginPath()
+            self._canvas.beginPath();
             self._canvas.moveTo(self._paddingYLeft + i * (self._widthCanvas - self._paddingYRight - self._paddingYLeft) / this._configuration.data.labels.length, self._paddingXTop)
             self._canvas.lineTo(self._paddingYLeft + i * (self._widthCanvas - self._paddingYRight - self._paddingYLeft) / this._configuration.data.labels.length, self._heightCanvas - self._paddingXBottom)
             self._canvas.lineWidth = self._lineXWidth;
@@ -3291,6 +3301,12 @@ function ChartArt (selector) {
         }
     }
     Bar.prototype.__beforeChanging = function () {
+        if (self._legend) {
+          self._paddingXTop = 30
+        } else {
+            self._paddingXTop = 10
+        }
+
         let [_maxValue] = [
             self._result.__max_min_values(this._configuration.data.datasets.data).max
         ];
@@ -3308,12 +3324,12 @@ function ChartArt (selector) {
         //_____________________
     }
     Bar.prototype.__setAxisX = function (_display) {
-        this.__setAxisXLine(_display)
+        this.__setAxisXLine(_display);
         if (_display) {
             self._canvas.font = self._labelsX.fontSize + 'px Arial';
-            let _heightAxis = null
+            let _heightAxis = null;
             if (self._labelsX.hasOwnProperty('fontSize')) {
-                _heightAxis = self._labelsX.fontSize * 2
+                _heightAxis = self._labelsX.fontSize * 2;
                 self._paddingXBottom = _heightAxis
             } else _heightAxis = self._paddingXBottom
             let _canvasBadgeWidth = (self._widthCanvas - (self._paddingYLeft + self._paddingYRight)) / this._configuration.data.labels.length
@@ -3331,18 +3347,44 @@ function ChartArt (selector) {
                 self._result.__max_min_values(this._configuration.data.datasets.data).max
             ]
         let _canvasBadgeWidth = (self._widthCanvas - (self._paddingYLeft + self._paddingYRight)) / this._configuration.data.labels.length
+        const _setProperties = (_index, _x1, _x2, _y1, _y2) => {
+            Object.defineProperty(this._barsPositions, _index, {
+                value: {
+                    x1: {x: _x1, y: _y1},
+                    x2: {x: _x1, y: _y2},
+                    y1: {x: _x2, y: _y1},
+                    y2: {x: _x2, y: _y2}
+                },
+                enumerable: true,
+                configurable: true,
+                writable: false
+            })
+        }
         this._configuration.data.labels.forEach((_, index) => {
             self._canvas.beginPath();
             self._canvas.fillStyle  = self.constructor.__drawLineColor(0, 0, 0, self._heightCanvas, ['#F21103', '#F86300', '#F7C601'])
-
             const _percentage = (this._configuration.data.datasets.data[index].value * 100) / _maxValue
             if (onChange) {
                 if (_maxHeight === _maxHeight - Math.round(((_maxHeight - self._paddingXTop) * _percentage) / 100)) {
+                    _setProperties(
+                        index,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2 + self._bars.width,
+                        _maxHeight - 1,
+                        _maxHeight
+                    );
                     self._canvas.fillRect(index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
                         _maxHeight,
                         self._bars.width,
                         -1)
                 } else {
+                    _setProperties(
+                        index,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2 + self._bars.width,
+                        _maxHeight - Math.round(((_maxHeight - self._paddingXTop) * _percentage) / 100),
+                        _maxHeight
+                    );
                     self._canvas.fillRect(index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
                         _maxHeight,
                         self._bars.width,
@@ -3351,6 +3393,13 @@ function ChartArt (selector) {
             } else {
                 let customHeight = 0;
                 if (_maxHeight === _maxHeight - Math.round(((_maxHeight - self._paddingXTop) * _percentage) / 100)) {
+                    _setProperties(
+                        index,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2 + self._bars.width,
+                        _maxHeight - 1,
+                        _maxHeight
+                    );
                     self._canvas.fillRect(index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
                         _maxHeight,
                         self._bars.width,
@@ -3365,20 +3414,30 @@ function ChartArt (selector) {
                                 -customHeight)
                         }, 500)
                     }
+                    _setProperties(
+                        index,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2,
+                        index * _canvasBadgeWidth + self._paddingYLeft + (_canvasBadgeWidth - self._bars.width) / 2 + self._bars.width,
+                        _maxHeight - Math.round(((_maxHeight - self._paddingXTop) * _percentage) / 100),
+                        _maxHeight
+                        );
                 }
             }
             self._canvas.closePath();
         })
     }
     Bar.prototype.__setLegend = function (percpective) {
-        self._canvas.textAlign = "left";
-        self._canvas.fillStyle = self._labelsX.color;
-        self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`, (() => {
-            let text = 'Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`
-            let widthTxt = self._canvas.measureText(text).width
-            return (self._widthCanvas / 2  - widthTxt / 2)
-        })(), 10)
-        self._canvas.clearColor;
+        if (self._legend) {
+            self._canvas.font = '16px Arial';
+            self._canvas.textAlign = "left";
+            self._canvas.fillStyle = self._labelsX.color;
+            self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`, (() => {
+                let text = 'Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`
+                let widthTxt = self._canvas.measureText(text).width
+                return (self._widthCanvas / 2  - widthTxt / 2)
+            })(), 15);
+            self._canvas.clearColor;
+        }
     }
     Bar.prototype.__draw = function () {
         this.__beforeChanging();
@@ -3386,7 +3445,7 @@ function ChartArt (selector) {
         this.__setAxisY(self._labelsX.display, self._labelsY.display);
         this.__setCoordinatesNet(self._labelsY.display);
         this.__setLegend(_legendInfo.info1);
-        this.__drawBars(this.animateBars)
+        this.__drawBars(this.animateBars);
     }
     Bar.prototype.__init = function () {
         setTimeout(() => {
@@ -3398,8 +3457,70 @@ function ChartArt (selector) {
         this.__draw()
     }
     Bar.prototype.__animate = function () {
-        this.__update()
+        this.__update();
         this.animateBars = true
+        // adding tooltip effect for Bar Chart _______________
+        let _tooltipElement = null;
+        if (self._barTooltip) {
+            if (document.querySelector('.tooltip-element-bar')) {
+                document.querySelector('.tooltip-element-bar').remove()
+            }
+            _tooltipElement = document.createElement('DIV');
+            _tooltipElement.className = 'tooltip-element-bar'
+            canvas.insertAdjacentElement('afterend', _tooltipElement);
+            canvas.addEventListener('mousemove', (e) => {
+                if (self._barTooltip) {
+                    let moveBar = false
+                    Array.from(Object.keys(self._result.bar._barsPositions)).forEach((_, index) => {
+                        if (e.offsetX >= self._result.bar._barsPositions[_].x1.x &&
+                            e.offsetX <= self._result.bar._barsPositions[_].y1.x &&
+                            e.offsetY >= self._result.bar._barsPositions[_].x1.y &&
+                            e.offsetY <= self._result.bar._barsPositions[_].y2.y) {
+                            moveBar = true;
+                            let [heightBar, maxHeight, tooltipHeight, tooltipWidth] = [
+                                self._result.bar._barsPositions[_].x2.y - self._result.bar._barsPositions[_].x1.y,
+                                self._result.bar._barsPositions[_].x2.y,
+                                _tooltipElement.getBoundingClientRect().height,
+                                _tooltipElement.getBoundingClientRect().width
+                            ];
+                            let [_top, _left, className] = [0, 0, null];
+                            _top = maxHeight - heightBar + canvas.offsetTop;
+                            _left = self._result.bar._barsPositions[_].x1.x + canvas.offsetLeft + self._bars.width + 10
+                            className = 'to-left';
+                            if (heightBar < tooltipHeight) {
+                                _top = maxHeight - tooltipHeight + canvas.offsetTop;
+                                className = 'to-left-bottom';
+                            }
+                            if (self._result.bar._barsPositions[_].x1.x + self._bars.width + tooltipWidth > self._widthCanvas - self._paddingYRight) {
+                                _left = self._result.bar._barsPositions[_].x1.x + canvas.offsetLeft - tooltipWidth - 10
+                                className = (heightBar < tooltipHeight) ? 'to-right-bottom' : 'to-right';
+                            }
+                            _tooltipElement.setAttribute('id', className);
+                            _tooltipElement.innerHTML = `
+                                <p>${_dataChart[_legendInfo.info2][Number(_)].text}</p>
+                                <p>${_dataChart[_legendInfo.info2][Number(_)].value}</p>
+                            `;
+                            _tooltipElement.style.cssText = `
+                                top: ${_top}px;
+                                left: ${_left}px;
+                                visibility: visible;
+                                opacity: 1
+                            `
+                        }
+                    })
+                    if (!moveBar) {
+                        Object.assign(_tooltipElement.style, {
+                            visibility: 'hidden',
+                            opacity: '0'
+                        })
+                    }
+                    /*>>>>> For Setter <<<<<<*/
+                    self._bars.mouseMove.callback = _tooltipElement;
+                    //_____________
+                }
+            })
+        }
+        //______________________________________
     }
     // ****************************
 
@@ -3459,6 +3580,14 @@ function ChartArt (selector) {
     this.constructor.__maxValueInit = function (options) {
         self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
         [{
+            nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
+            value: true,
+            emptyProperty: true
+        }, {
+            nesting: ['options', 'legend'],
+            value: true,
+            emptyProperty: true
+        }, {
             nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
             value: 16,
             emptyProperty: 13
@@ -3466,6 +3595,10 @@ function ChartArt (selector) {
             nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
             value: 16,
             emptyProperty: 13
+        }, {
+            nesting: ['options', 'padding', 'paddingTop'],
+            value: 40,
+            emptyProperty: 10
         }, {
             nesting: ['options', 'padding', 'paddingBottom'],
             value: 30,
@@ -3495,6 +3628,8 @@ function ChartArt (selector) {
         selector.height               = self._heightCanvas;
         self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
         self._bars                    = parameters.options.bars;
+        self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
+        self._legend                  = parameters.options.legend;
         self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
         self._paddingXBottom          = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
         self._paddingYRight           = parameters.options.padding && parameters.options.padding.paddingRight || 10;
@@ -3508,6 +3643,7 @@ function ChartArt (selector) {
         self._paddingXBottom = self._labelsX.display ? self._paddingXBottom: 10;
         self._paddingYLeft = self._labelsY.display ? self._paddingYLeft + (50 - self._paddingYLeft): 10;
         self._result = new Result(selector, parameters);
+
         return self._result[parameters.type]
     }
     return new Result(selector)
@@ -3523,7 +3659,12 @@ new ChartArt(canvas).__init({
         }
     },
     options: {
+        legend: true,
         bars: {
+            mouseMove: {
+                tooltip: false,
+                set callback (element) {}
+            },
             width: 40
         },
         padding: {
