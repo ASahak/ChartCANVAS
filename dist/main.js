@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    transition: all cubic-bezier(.075,.82,.165,1) .1s;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
+exports.push([module.i, "#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.show_tooltip{\r\n    transition: cubic-bezier(.075,.82,.165,1) .4s;\r\n    visibility: visible;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
 
 
 /***/ }),
@@ -3110,6 +3110,14 @@ function ChartArt (selector) {
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
+        barFolder.addColor(self, '_axisColor')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            })
+        barFolder.add(self, '_axisOpacity', 0, 1)
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            })
         const _bars = barFolder.addFolder('bars');
         _bars.add(self._bars, 'width', 20, 60)
             .onChange(() => {
@@ -3119,6 +3127,20 @@ function ChartArt (selector) {
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
+        // Bars Colors ______________
+        _bars.addColor(self._barsColors, 'one')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            });
+        _bars.addColor(self._barsColors, 'two')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            });
+        _bars.addColor(self._barsColors, 'three')
+            .onChange(() => {
+                requestAnimationFrame(this.__animate.bind(this))
+            });
+        //_________________
 
         // Sub Folders
         const xAxis = barFolder.addFolder('xAxis')
@@ -3176,10 +3198,10 @@ function ChartArt (selector) {
             self._canvas.lineTo(self._paddingYLeft, self._paddingXTop),
             self._canvas.lineWidth = self._lineYWidth
         );
-        if (self._borderColor instanceof Array) {
-            self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
+        if (self._axisOpacity !== 1) {
+            self._canvas.strokeStyle = self._axisColor.replace(')', ', ' + self._axisOpacity + ')').replace('rgb', 'rgba')
         } else {
-            self._canvas.strokeStyle = self._borderColor
+            self._canvas.strokeStyle = self._axisColor
         }
         self._canvas.stroke();
         self._canvas.closePath();
@@ -3198,11 +3220,11 @@ function ChartArt (selector) {
             self._canvas.moveTo(self._paddingYLeft, self._heightCanvas - _heightAxis),
             self._canvas.lineTo(self._widthCanvas - self._paddingYRight, self._heightCanvas - _heightAxis),
             self._canvas.lineWidth = self._lineYWidth
-        )
-        if (self._borderColor instanceof Array) {
-                self._canvas.strokeStyle = `rgba(${self._borderColor[0]}, ${self._borderColor[1]}, ${self._borderColor[2]}, ${self._borderOpacity})`
+        );
+        if (self._axisOpacity !== 1) {
+            self._canvas.strokeStyle = self._axisColor.replace(')', ', ' + self._axisOpacity + ')').replace('rgb', 'rgba')
         } else {
-            self._canvas.strokeStyle = self._borderColor
+            self._canvas.strokeStyle = self._axisColor
         }
         self._canvas.stroke();
         self._canvas.closePath();
@@ -3362,7 +3384,7 @@ function ChartArt (selector) {
         }
         this._configuration.data.labels.forEach((_, index) => {
             self._canvas.beginPath();
-            self._canvas.fillStyle  = self.constructor.__drawLineColor(0, 0, 0, self._heightCanvas, ['#F21103', '#F86300', '#F7C601'])
+            self._canvas.fillStyle  = self.constructor.__drawLineColor(0, 0, 0, self._heightCanvas, [self._barsColors.one, self._barsColors.two, self._barsColors.three])
             const _percentage = (this._configuration.data.datasets.data[index].value * 100) / _maxValue
             if (onChange) {
                 if (_maxHeight === _maxHeight - Math.round(((_maxHeight - self._paddingXTop) * _percentage) / 100)) {
@@ -3430,7 +3452,7 @@ function ChartArt (selector) {
         if (self._legend) {
             self._canvas.font = '16px Arial';
             self._canvas.textAlign = "left";
-            self._canvas.fillStyle = self._labelsX.color;
+            self._canvas.fillStyle = 'rgb(20, 17, 17)';
             self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`, (() => {
                 let text = 'Predicted world population ' + `(${percpective}) in ${_legendInfo.info2}`
                 let widthTxt = self._canvas.measureText(text).width
@@ -3462,15 +3484,9 @@ function ChartArt (selector) {
         // adding tooltip effect for Bar Chart _______________
         let _tooltipElement = null;
         if (self._barTooltip) {
-            if (document.querySelector('.tooltip-element-bar')) {
-                document.querySelector('.tooltip-element-bar').remove()
-            }
-            _tooltipElement = document.createElement('DIV');
-            _tooltipElement.className = 'tooltip-element-bar'
-            canvas.insertAdjacentElement('afterend', _tooltipElement);
-            canvas.addEventListener('mousemove', (e) => {
+            const canvasMove = (e) => {
                 if (self._barTooltip) {
-                    let moveBar = false
+                    let moveBar = false;
                     Array.from(Object.keys(self._result.bar._barsPositions)).forEach((_, index) => {
                         if (e.offsetX >= self._result.bar._barsPositions[_].x1.x &&
                             e.offsetX <= self._result.bar._barsPositions[_].y1.x &&
@@ -3503,22 +3519,28 @@ function ChartArt (selector) {
                             _tooltipElement.style.cssText = `
                                 top: ${_top}px;
                                 left: ${_left}px;
-                                visibility: visible;
-                                opacity: 1
-                            `
+                            `;
+                            _tooltipElement.style.cssText += 'opacity: 1'
+                            _tooltipElement.classList.add('show_tooltip')
                         }
                     })
                     if (!moveBar) {
-                        Object.assign(_tooltipElement.style, {
-                            visibility: 'hidden',
-                            opacity: '0'
-                        })
+                        _tooltipElement.style.cssText += 'opacity: 0'
+                        _tooltipElement.classList.remove('show_tooltip')
                     }
                     /*>>>>> For Setter <<<<<<*/
                     self._bars.mouseMove.callback = _tooltipElement;
                     //_____________
                 }
-            })
+            };
+            canvas.removeEventListener('mousemove', canvasMove, false);
+            if (document.querySelector('.tooltip-element-bar')) {
+                document.querySelectorAll('.tooltip-element-bar').forEach(_ => _.remove())
+            }
+            _tooltipElement = document.createElement('DIV');
+            _tooltipElement.className = 'tooltip-element-bar'
+            canvas.insertAdjacentElement('afterend', _tooltipElement);
+            canvas.addEventListener('mousemove', canvasMove)
         }
         //______________________________________
     }
@@ -3580,6 +3602,10 @@ function ChartArt (selector) {
     this.constructor.__maxValueInit = function (options) {
         self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
         [{
+            nesting: ['options', 'scales', 'axisColor'],
+            value: 'rgb(85,72,72)',
+            emptyProperty: 'rgb(85,72,72)'
+        }, {
             nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
             value: true,
             emptyProperty: true
@@ -3628,6 +3654,7 @@ function ChartArt (selector) {
         selector.height               = self._heightCanvas;
         self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
         self._bars                    = parameters.options.bars;
+        self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
         self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
         self._legend                  = parameters.options.legend;
         self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
@@ -3637,6 +3664,8 @@ function ChartArt (selector) {
         self._lineYWidth              = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
         self._lineXWidth              = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
         self._borderColor             = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || '#000';
+        self._axisColor               = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
+        self._axisOpacity             = 1;
         self._borderOpacity           = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
         self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
         self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
@@ -3661,8 +3690,9 @@ new ChartArt(canvas).__init({
     options: {
         legend: true,
         bars: {
+            backgroundColors: { one: '#F21103', two: '#F86300', three: '#F7C601'},
             mouseMove: {
-                tooltip: false,
+                tooltip: true,
                 set callback (element) {}
             },
             width: 40
@@ -3673,6 +3703,7 @@ new ChartArt(canvas).__init({
             paddingBottom: 10
         },
         scales: {
+            axisColor: 'rgb(85,72,72)',
             yAxis: {
                 lineWidth: 1,
                 tricks: {
