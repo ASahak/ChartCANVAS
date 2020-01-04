@@ -644,7 +644,7 @@ function ChartArt (selector) {
                     this._radius,
                     this._colors[index % this._colors.length],
                     index,
-                    self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns tru color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
+                    self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
                 ));
             });
             const $syncInterval = setInterval(() => {
@@ -928,110 +928,3 @@ new ChartArt(canvas).__init({
 //         }
 //     }
 // })
-
-
-// let values = [788000000, 578000000, 398000000, 0, 3780000000, 769000000, 27000000];
-// function draw() {
-//     var canvas2 = document.getElementById("canvas");
-//     var ctx = canvas2.getContext("2d");
-//     let previousRadian = 0;
-//     var colors = ['#4CAF50', '#00BCD4', '#E91E63','#FFC107', '#9E9E9E'];
-//     var angles = [Math.PI * 0.3, Math.PI * 0.7, Math.PI * 0.5, Math.PI * 0.5];
-//     let total = 788000000+ 578000000+ 398000000+ 0+ 3780000000+ 769000000+ 27000000;
-//     var middle = {
-//         x: canvas2.width / 2,
-//         y: canvas2.height / 2,
-//         radius: canvas2.height / 2
-//     };
-//     let obj = {};
-//     let anglePI = previousRadian;
-//     let count = -1;
-//     let firstRequest = true;
-//
-//     function intervalArcs (startAngle, endAngle, movingX, movingY) {
-//         // obj.radian = (Math.PI * 2) * (values[count] / total);
-//         // ctx.clearRect(0,0,300, 300);
-//         ctx.fillStyle = colors[count % colors.length];
-//         ctx.lineWidth = 2;
-//         ctx.beginPath();
-//         ctx.moveTo(movingX, movingY);
-//         ctx.arc(movingX, movingY, middle.radius - 2, startAngle, endAngle, false);
-//         ctx.closePath();
-//         ctx.lineTo(movingX, movingY);
-//         ctx.fill();
-//         ctx.strokeStyle = '#fff';
-//         ctx.stroke();
-//         ctx.beginPath();
-//         ctx.save();
-//         ctx.translate(movingX, movingY);
-//         // ctx.font = middle.radius / 10 + "px Arial";
-//         // ctx.rotate(previousRadian + obj.radian);
-//         ctx.restore();
-//         // previousRadian += obj.radian
-//         // if (count < 3) {
-//         //     startAnimation()
-//         // }
-//         // var labelText = "'" + obj.label + "' " + parseInt((values[i] / total) * 100) + "%";
-//         // ctx.fillText(labelText, ctx.measureText(labelText).width/2, 0);
-//
-//     }
-//     let animationStep = 10;
-//     let mocke = {
-//         begin:[],
-//         end:[]
-//     }
-//     function startAnimation () {
-//         count++;
-//         if (count === 0) {
-//             mocke.begin.push(0)
-//             mocke.end.push((Math.PI * 2) * (values[0] / total))
-//         } else {
-//             mocke.begin.push((() =>  {
-//                 let a = 0;
-//                 a += mocke.begin[count -1] + (Math.PI * 2) * (values[count-1] / total)
-//                 return a
-//             })())
-//             mocke.end.push((() =>  {
-//                 let a = 0;
-//                 a += mocke.end[count -1] + (Math.PI * 2) * (values[count] / total)
-//                 return a
-//             })())
-//         }
-//         callDraw()
-//     }
-//     function findPointOnCircle(originX, originY , radius, angleRadians) {
-//         var newX = radius * Math.cos(angleRadians) + originX
-//         var newY = radius * Math.sin(angleRadians) + originY
-//         return {"x" : newX, "y" : newY}
-//     }
-//     function callDraw () {
-//         const newCoords = findPointOnCircle(150, 150, 150, mocke.begin[count]+(mocke.end[count]-mocke.begin[count])/2);
-//         const everyX = Math.cos(mocke.begin[count]+(mocke.end[count]-mocke.begin[count])/2);
-//         const everyY = Math.sin(mocke.begin[count]+(mocke.end[count]-mocke.begin[count])/2);
-//         let movingX = newCoords.x;
-//         let movingY = newCoords.y;
-//         const $interval = window.setInterval(() => {
-//             if (Math.round(movingX) === middle.x && Math.round(movingY) === middle.y) {
-//                 window.clearInterval($interval);
-//                 if (count < 6) {
-//                     setTimeout(() => startAnimation(), 0)
-//                 }
-//             } else {
-//                 if (movingX < middle.x) {
-//                     movingX+=Math.abs(everyX);
-//                 } else {
-//                     movingX-=everyX;
-//                 }
-//                 if (movingY < middle.y) {
-//                     movingY+=Math.abs(everyY);
-//                 } else {
-//                     movingY-=everyY;
-//                 }
-//                 intervalArcs(mocke.begin[count], mocke.end[count], movingX, movingY);
-//             }
-//         }, animationStep / 10)
-//     }
-//     startAnimation()
-// }
-//
-// window.onload = draw
