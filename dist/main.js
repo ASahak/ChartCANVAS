@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.show_tooltip{\r\n    transition: cubic-bezier(.075,.82,.165,1) .4s;\r\n    visibility: visible;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
+exports.push([module.i, "body {\r\n    margin: 0;\r\n}\r\n#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.show_tooltip{\r\n    transition: cubic-bezier(.075,.82,.165,1) .4s;\r\n    visibility: visible;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
 
 
 /***/ }),
@@ -3089,8 +3089,10 @@ function ChartArt (selector) {
     this._widthCanvas       = 800;
     function Result (elem, options) {
         if (options) {
-            this.bar = new Bar(options);
-            this.bar.__init();
+            // this.bar = new Bar(options);
+            // this.bar.__init();
+            this.pie = new Pie(options);
+            this.pie.__init();
         }
     }
 
@@ -3480,7 +3482,7 @@ function ChartArt (selector) {
     }
     Bar.prototype.__animate = function () {
         this.__update();
-        this.animateBars = true
+        this.animateBars = true;
         // adding tooltip effect for Bar Chart _______________
         let _tooltipElement = null;
         if (self._barTooltip) {
@@ -3546,7 +3548,222 @@ function ChartArt (selector) {
     }
     // ****************************
 
+    /*******************Pie Chart**********************/
+    function Pie (options) {
+        this._gui = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+        const _pieFolder = this._gui.addFolder('Pie');
+        this._configuration = options;
+        this._animateRadius = false;
+        this._values = [];
+        this._radius = 150;
+        this._colors = [];
+        this._angles = {
+            begin:[],
+            end:[]
+        };
+        this._countPies = -1;
+        this._totalValues = 0;
+        _dataChart[_legendInfo.info2].map(_ => {
+            this._values.push(_.value);
+            this._totalValues += _.value
+        });
+        this._pieParts = [];
+        this._mouse = {x :0, y:0, oldx: 0, oldy:0};
+    }
+    Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
+        const destX = radius * Math.cos(angleRadians) + originX;
+        const destY = radius * Math.sin(angleRadians) + originY;
+        return {x : destX, y : destY}
+    };
+    Pie.prototype.__generatePieAngles = function (count) {
+        if (count === 0) {
+            this._angles.begin.push(0)
+            this._angles.end.push((Math.PI * 2) * (this._values[0] / this._totalValues))
+        } else {
+            this._angles.begin.push((() =>  {
+                let a = 0;
+                a += this._angles.begin[count - 1] + (Math.PI * 2) * (this._values[count - 1] / this._totalValues);
+                return a
+            })());
+            this._angles.end.push((() =>  {
+                let a = 0;
+                a += this._angles.end[count -1] + (Math.PI * 2) * (this._values[count] / this._totalValues);
+                return a
+            })())
+        }
+    };
+    function SinglePies (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor) {
+        this.movingX = movingX;
+        this.movingY = movingY;
+        this.opacity = 1;
+        this.color = color;
+        this.leaveColor = color;
+        this.hoverColor = hoverColor;
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+        this.radius = 0;
+        this.index = index;
+    }
+    /*****this one is one of the some animation examples (from arc to center)*****/
+    Pie.prototype.__movingPies = function () {
+        const _newCoords = this.__findPointOnCircle(
+            self._widthCanvas / 2,
+            self._heightCanvas / 2,
+            this._radius / 2, /*distance from center*/
+            this._angles.begin[index]+(this._angles.end[index]-this._angles.begin[index])/2);
+        const _everyX = Math.cos(this._angles.begin[index]+(this._angles.end[index]-this._angles.begin[index])/2);
+        const _everyY = Math.sin(this._angles.begin[index]+(this._angles.end[index]-this._angles.begin[index])/2);
+        let _movingX = _newCoords.x;
+        let _movingY = _newCoords.y;
+
+        /******this code should be only in the singlePie prototype***/
+        // if (Math.round(this.movingX) === self._widthCanvas / 2 && Math.round(this.movingY) === self._heightCanvas / 2) {
+        //     window.clearInterval($interval);
+        // } else {
+        //     this._opacity += this._opacity > 1 ? 0: 0.07;
+        //     if (this.movingX < self._widthCanvas / 2) {
+        //         this.movingX+=Math.abs(this.everyX);
+        //     } else {
+        //         this.movingX-=this.everyX;
+        //     }
+        //     if (this.movingY < self._heightCanvas / 2) {
+        //         this.movingY+=Math.abs(this.everyY);
+        //     } else {
+        //         this.movingY-=this.everyY;
+        //     }
+        //     this.color = self._result.__convertHex(color, this._opacity);
+        //     this.__draw()
+        // }
+    }
+    Pie.prototype.__clearCircle = function (context,x,y,radius) {
+        context.save();
+        context.beginPath();
+        context.arc(x, y, radius, 0, 2*Math.PI, true);
+        context.clip();
+        context.clearRect(x-radius,y-radius,radius*2,radius*2);
+        context.restore();
+    };
+    SinglePies.prototype.__draw = function () {
+        self._canvas.fillStyle = this.color;
+        self._canvas.lineWidth = 1;
+        self._canvas.beginPath();
+        self._canvas.moveTo(this.movingX, this.movingY);
+        self._canvas.arc(this.movingX, this.movingY, this.radius, this.startAngle, this.endAngle, false);
+        // self._canvas.closePath();
+        self._canvas.lineTo(this.movingX, this.movingY);
+        self._canvas.fill();
+        self._canvas.addHitRegion({id: 'arc_' + this.index});
+        self._canvas.strokeStyle = '#fff';
+        self._canvas.stroke();
+        self._canvas.beginPath();
+        self._canvas.save();
+        self._canvas.translate(this.movingX, this.movingY);
+        // ctx.font = middle.radius / 10 + "px Arial";
+        // ctx.rotate(previousRadian + obj.radian);
+        self._canvas.restore();
+        // var labelText = "'" + obj.label + "' " + parseInt((values[i] / total) * 100) + "%";
+        // self._canvas.fillText(labelText, self._canvas.measureText(labelText).width/2, 0);
+    };
+    SinglePies.prototype.__update = function (_constructor) {
+        // self.constructor.__maxValueInit(this._configuration)
+        const $interval = window.setInterval(() => {
+            if (this.radius >= self._result.pie._radius) {
+                window.clearInterval($interval);
+            } else {
+                this.radius+=3;
+                this.__draw()
+            }
+        }, 10);
+    };
+    Pie.prototype.__animate = function () {
+        this._countPies++;
+        this._pieParts[this._countPies].__update(this._pieParts[this._countPies]);
+    };
+    Pie.prototype.__init = async function () {
+        await setTimeout(() => {
+            this._values.forEach((_, index)=> {
+                this.__generatePieAngles(index);
+                this._colors.push(self._result.__getRandomColor());
+                this._pieParts.push(new SinglePies(
+                    self._widthCanvas / 2, self._heightCanvas / 2,
+                    this._angles.begin[index],
+                    this._angles.end[index],
+                    this._radius,
+                    this._colors[index % this._colors.length],
+                    index,
+                    self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
+                ));
+            });
+            const $syncInterval = setInterval(() => {
+                if (this._countPies < this._pieParts.length - 1) {
+                    this.__animate();
+                } else {
+                    clearInterval($syncInterval);
+                    setTimeout(() => {
+                        this._pieParts.map(_class => {
+                            _class.__draw()
+                        })
+                    }, 500)
+                }
+            }, 200)
+        }, 0);
+        let _prevId = null;
+        let _prevColor = null;
+        await canvas.addEventListener('mousemove', (event) => {
+            if (event.region) {
+                if (_prevId !== event.region) {
+                    _prevColor = this._pieParts[+event.region.split('_')[1]].color;
+                    this._pieParts[+event.region.split('_')[1]].color = this._pieParts[+event.region.split('_')[1]].hoverColor;
+                    this._pieParts[+event.region.split('_')[1]].__draw();
+                    if (_prevId) {
+                        this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
+                        this._pieParts[+_prevId.split('_')[1]].__draw();
+                    }
+                }
+                _prevId = event.region;
+            } else {
+                if (_prevId) {
+                    this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
+                    this._pieParts[+_prevId.split('_')[1]].__draw();
+                }
+                _prevId = null
+            }
+            // this._mouse.x = event.clientX;
+            // this._mouse.y = event.clientY;
+        });
+    };
+    /*********************************/
+
     /******************HELPERS***********/
+    Result.prototype.__convertHex = function (hex,opacity){
+        let hexCode = hex.replace('#',''),
+        r = parseInt(hexCode.substring(0,2), 16),
+        g = parseInt(hexCode.substring(2,4), 16),
+        b = parseInt(hexCode.substring(4,6), 16);
+
+        const result = 'rgba('+r+','+g+','+b+','+opacity+')';
+        return result;
+    };
+    Result.prototype.__getRandomColor = function () {
+        return '#'+Math.random().toString(16).substr(2,6);;
+    };
+    /*___For some color to change more lighter or darker ____*/
+    Result.prototype.__colorLuminance = function (hex, lum) {
+        // validate hex string
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        }
+        lum = lum || 0;
+        // convert to decimal and change luminosity
+        let rgb = "#", c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i*2,2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00"+c).substr(c.length);
+        }
+        return rgb;
+    };
     Result.prototype.__fittingString = function (c, str, maxWidth) {
         let width = c.measureText(str).width;
         let ellipsis = '…';
@@ -3581,7 +3798,7 @@ function ChartArt (selector) {
                 }
             } else {
                 let _last = nest.nesting.pop()
-                if (!res.hasOwnProperty(_)) {
+                if (res && !res.hasOwnProperty(_)) {
                     res[_] = nest.emptyProperty
                 } else if (res instanceof Object) {
                     options[_last] = (options[_last] > nest.value) ? nest.value : res[_last]
@@ -3601,51 +3818,59 @@ function ChartArt (selector) {
 
     this.constructor.__maxValueInit = function (options) {
         self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
-        [{
-            nesting: ['options', 'scales', 'axisColor'],
-            value: 'rgb(85,72,72)',
-            emptyProperty: 'rgb(85,72,72)'
-        }, {
-            nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
-            value: true,
-            emptyProperty: true
-        }, {
-            nesting: ['options', 'legend'],
-            value: true,
-            emptyProperty: true
-        }, {
-            nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
-            value: 16,
-            emptyProperty: 13
-        }, {
-            nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
-            value: 16,
-            emptyProperty: 13
-        }, {
-            nesting: ['options', 'padding', 'paddingTop'],
-            value: 40,
-            emptyProperty: 10
-        }, {
-            nesting: ['options', 'padding', 'paddingBottom'],
-            value: 30,
-            emptyProperty: 20
-        }, {
-            nesting: ['options', 'padding', 'paddingLeft'],
-            value: 50,
-            emptyProperty: 10
-        }, {
-            nesting: ['options', 'bars', 'width'],
-            value: 60,
-            emptyProperty: 40
-        }, {
-            nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'display'],
-            value: true,
-            emptyProperty: true
-        }, {
-            nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'display'],
-            value: true,
-            emptyProperty: true
-        }].forEach(_ => self.constructor.__maxValue(_, options))
+        if (options.type === 'bar') {
+            [{
+                nesting: ['options', 'scales', 'axisColor'],
+                value: 'rgb(85,72,72)',
+                emptyProperty: 'rgb(85,72,72)'
+            }, {
+                nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
+                value: true,
+                emptyProperty: true
+            }, {
+                nesting: ['options', 'legend'],
+                value: true,
+                emptyProperty: true
+            }, {
+                nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
+                value: 16,
+                emptyProperty: 13
+            }, {
+                nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
+                value: 16,
+                emptyProperty: 13
+            }, {
+                nesting: ['options', 'padding', 'paddingTop'],
+                value: 40,
+                emptyProperty: 10
+            }, {
+                nesting: ['options', 'padding', 'paddingBottom'],
+                value: 30,
+                emptyProperty: 20
+            }, {
+                nesting: ['options', 'padding', 'paddingLeft'],
+                value: 50,
+                emptyProperty: 10
+            }, {
+                nesting: ['options', 'bars', 'width'],
+                value: 60,
+                emptyProperty: 40
+            }, {
+                nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'display'],
+                value: true,
+                emptyProperty: true
+            }, {
+                nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'display'],
+                value: true,
+                emptyProperty: true
+            }].forEach(_ => self.constructor.__maxValue(_, options))
+        } else if (options.type === 'pie' || options.type === 'doughnut') {
+            [{
+                nesting: ['options', 'centerSize'],
+                value: 100,
+                emptyProperty: 50
+            }].forEach(_ => self.constructor.__maxValue(_, options))
+        }
     }
     /*_________________________________*/
 
@@ -3653,6 +3878,7 @@ function ChartArt (selector) {
         selector.width                = self._widthCanvas;
         selector.height               = self._heightCanvas;
         self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
+        // For Bar Chart ~~~~~~~~~
         self._bars                    = parameters.options.bars;
         self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
         self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
@@ -3669,64 +3895,86 @@ function ChartArt (selector) {
         self._borderOpacity           = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
         self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
         self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
-        self._paddingXBottom = self._labelsX.display ? self._paddingXBottom: 10;
-        self._paddingYLeft = self._labelsY.display ? self._paddingYLeft + (50 - self._paddingYLeft): 10;
+        self._paddingXBottom          = self._labelsX.display ? self._paddingXBottom: 10;
+        self._paddingYLeft            = self._labelsY.display ? self._paddingYLeft + (50 - self._paddingYLeft): 10;
+        //~~~~~~~~~~~~~~~~~~~~~~
+
+        // For Pie Chart ~~~~~~~~~~~~~~~~~~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~
         self._result = new Result(selector, parameters);
 
         return self._result[parameters.type]
     }
     return new Result(selector)
 }
+// For Pie Chart
 new ChartArt(canvas).__init({
-    type: 'bar',
+    type: 'pie',
     data: {
         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
         datasets: {
+            legends: {
+                display: true
+            },
             data: _dataChart[_legendInfo.info2],
-            borderColor: [175, 160, 160],
-            borderOpacity: 1
         }
     },
     options: {
-        legend: true,
-        bars: {
-            backgroundColors: { one: '#F21103', two: '#F86300', three: '#F7C601'},
-            mouseMove: {
-                tooltip: true,
-                set callback (element) {}
-            },
-            width: 40
-        },
-        padding: {
-            paddingLeft: 10,
-            paddingRight: 30,
-            paddingBottom: 10
-        },
-        scales: {
-            axisColor: 'rgb(85,72,72)',
-            yAxis: {
-                lineWidth: 1,
-                tricks: {
-                    labels: {
-                        display: true,
-                        fontSize: 14,
-                        color: 'rgb(35,32,32)'
-                    }
-                }
-            },
-            xAxis: {
-                lineWidth: 1,
-                tricks: {
-                    labels: {
-                        display: true,
-                        fontSize: 14,
-                        color: 'rgb(35,32,32)'
-                    }
-                }
-            }
-        }
+        centerSize: 50
     }
-})
+});
+// For Bar Chart
+// new ChartArt(canvas).__init({
+//     type: 'bar',
+//     data: {
+//         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+//         datasets: {
+//             data: _dataChart[_legendInfo.info2],
+//             borderColor: [175, 160, 160],
+//             borderOpacity: 1
+//         }
+//     },
+//     options: {
+//         legend: true,
+//         bars: {
+//             backgroundColors: { one: '#F21103', two: '#F86300', three: '#F7C601'},
+//             mouseMove: {
+//                 tooltip: true,
+//                 set callback (element) {}
+//             },
+//             width: 40
+//         },
+//         padding: {
+//             paddingLeft: 10,
+//             paddingRight: 30,
+//             paddingBottom: 10
+//         },
+//         scales: {
+//             axisColor: 'rgb(85,72,72)',
+//             yAxis: {
+//                 lineWidth: 1,
+//                 tricks: {
+//                     labels: {
+//                         display: true,
+//                         fontSize: 14,
+//                         color: 'rgb(35,32,32)'
+//                     }
+//                 }
+//             },
+//             xAxis: {
+//                 lineWidth: 1,
+//                 tricks: {
+//                     labels: {
+//                         display: true,
+//                         fontSize: 14,
+//                         color: 'rgb(35,32,32)'
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// })
 
 /***/ }),
 
