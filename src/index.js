@@ -430,9 +430,9 @@ function ChartArt (selector) {
         }, 0)
     }
     Bar.prototype.__update = function () {
-        self.constructor.__maxValueInit(this._configuration)
+        self.constructor.__maxValueInit(this._configuration);
         this.__draw()
-    }
+    };
     Bar.prototype.__animate = function () {
         this.__update();
         this.animateBars = true;
@@ -514,6 +514,7 @@ function ChartArt (selector) {
             begin:[],
             end:[]
         };
+        this.betweenAngles = [];
         this._countPies = -1;
         this._totalValues = 0;
         _dataChart[_legendInfo.info2].map(_ => {
@@ -548,7 +549,6 @@ function ChartArt (selector) {
     function SinglePies (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor) {
         this.movingX = movingX;
         this.movingY = movingY;
-        this.opacity = 1;
         this.color = color;
         this.leaveColor = color;
         this.hoverColor = hoverColor;
@@ -605,7 +605,6 @@ function ChartArt (selector) {
         // self._canvas.closePath();
         self._canvas.lineTo(this.movingX, this.movingY);
         self._canvas.fill();
-        self._canvas.addHitRegion({id: 'arc_' + this.index});
         self._canvas.strokeStyle = '#fff';
         self._canvas.stroke();
         self._canvas.beginPath();
@@ -632,10 +631,15 @@ function ChartArt (selector) {
         this._countPies++;
         this._pieParts[this._countPies].__update(this._pieParts[this._countPies]);
     };
+    Pie.prototype.__pointInCircleSQRT = function (x, y, cx, cy, radius) {
+        const distSq = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+        return distSq <= radius;
+    };
     Pie.prototype.__init = async function () {
         await setTimeout(() => {
             this._values.forEach((_, index)=> {
                 this.__generatePieAngles(index);
+                this.betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
                 this._colors.push(self._result.__getRandomColor());
                 this._pieParts.push(new SinglePies(
                     self._widthCanvas / 2, self._heightCanvas / 2,
@@ -663,17 +667,28 @@ function ChartArt (selector) {
         let _prevId = null;
         let _prevColor = null;
         await canvas.addEventListener('mousemove', (event) => {
-            if (event.region) {
-                if (_prevId !== event.region) {
-                    _prevColor = this._pieParts[+event.region.split('_')[1]].color;
-                    this._pieParts[+event.region.split('_')[1]].color = this._pieParts[+event.region.split('_')[1]].hoverColor;
-                    this._pieParts[+event.region.split('_')[1]].__draw();
-                    if (_prevId) {
-                        this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
-                        this._pieParts[+_prevId.split('_')[1]].__draw();
+            const diffX = event.pageX - self._widthCanvas / 2;
+            const diffY = event.pageY - self._heightCanvas / 2;
+            let angle = Math.atan2(diffY, diffX);
+            let realAngle = angle;
+            if (angle < 0) {
+                realAngle = (Math.PI - Math.abs(angle)) + Math.PI
+            }
+            if (this.__pointInCircleSQRT(event.pageX, event.pageY, self._widthCanvas / 2, self._heightCanvas / 2, this._radius)){
+                this.betweenAngles.map((_angles, _index) => {
+                    if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
+                        if (_prevId !== 'arc_' + _index) {
+                            _prevColor = this._pieParts[+('arc_' + _index).split('_')[1]].color;
+                            this._pieParts[+('arc_' + _index).split('_')[1]].color = this._pieParts[+('arc_' + _index).split('_')[1]].hoverColor;
+                            this._pieParts[+('arc_' + _index).split('_')[1]].__draw();
+                            if (_prevId) {
+                                this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
+                                this._pieParts[+_prevId.split('_')[1]].__draw();
+                            }
+                        }
+                        _prevId = 'arc_' + _index;
                     }
-                }
-                _prevId = event.region;
+                })
             } else {
                 if (_prevId) {
                     this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
@@ -681,8 +696,6 @@ function ChartArt (selector) {
                 }
                 _prevId = null
             }
-            // this._mouse.x = event.clientX;
-            // this._mouse.y = event.clientY;
         });
     };
     /*********************************/
@@ -693,12 +706,11 @@ function ChartArt (selector) {
         r = parseInt(hexCode.substring(0,2), 16),
         g = parseInt(hexCode.substring(2,4), 16),
         b = parseInt(hexCode.substring(4,6), 16);
-
         const result = 'rgba('+r+','+g+','+b+','+opacity+')';
         return result;
     };
     Result.prototype.__getRandomColor = function () {
-        return '#'+Math.random().toString(16).substr(2,6);;
+        return '#'+Math.random().toString(16).substr(2,6);
     };
     /*___For some color to change more lighter or darker ____*/
     Result.prototype.__colorLuminance = function (hex, lum) {
@@ -738,7 +750,7 @@ function ChartArt (selector) {
         return {
             max, min
         }
-    }
+    };
     this.constructor.__maxValue = function (nest, options) {
         let res;
         nest.nesting.forEach((_, index) => {
