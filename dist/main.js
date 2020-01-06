@@ -3561,7 +3561,7 @@ function ChartArt (selector) {
             begin:[],
             end:[]
         };
-        this.betweenAngles = [];
+        this._betweenAngles = [];
         this._countPies = -1;
         this._totalValues = 0;
         _dataChart[_legendInfo.info2].map(_ => {
@@ -3569,7 +3569,6 @@ function ChartArt (selector) {
             this._totalValues += _.value
         });
         this._pieParts = [];
-        this._mouse = {x :0, y:0, oldx: 0, oldy:0};
     }
     Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
         const destX = radius * Math.cos(angleRadians) + originX;
@@ -3634,7 +3633,7 @@ function ChartArt (selector) {
         //     this.color = self._result.__convertHex(color, this._opacity);
         //     this.__draw()
         // }
-    }
+    };
     Pie.prototype.__clearCircle = function (context,x,y,radius) {
         context.save();
         context.beginPath();
@@ -3663,6 +3662,27 @@ function ChartArt (selector) {
         // var labelText = "'" + obj.label + "' " + parseInt((values[i] / total) * 100) + "%";
         // self._canvas.fillText(labelText, self._canvas.measureText(labelText).width/2, 0);
     };
+    SinglePies.prototype.__tooltip = function (x, y, width ,text, quadroFill) {
+        self._canvas.beginPath();
+        self._canvas.rect(x, y, width, 20);
+        self._canvas.fillStyle = 'rgb(0,0,0)';
+        self._canvas.globalAlpha = .8
+        self._canvas.fill();
+        self._canvas.strokeStyle = '#fff';
+        self._canvas.fillStyle = '#fff';
+        self._canvas.fillText(self._result.__fittingString(self._canvas, text, width), x + 20, y + 14);
+        self._canvas.clearColor;
+        self._canvas.stroke();
+        self._canvas.closePath();
+
+        self._canvas.beginPath();
+        self._canvas.lineWidth = 2;
+        self._canvas.rect(x + 5, y + 5, 10, 10);
+        self._canvas.fillStyle = quadroFill;
+        self._canvas.globalAlpha = 1;
+        self._canvas.fill();
+        self._canvas.closePath();
+    };
     SinglePies.prototype.__update = function (_constructor) {
         // self.constructor.__maxValueInit(this._configuration)
         const $interval = window.setInterval(() => {
@@ -3686,7 +3706,7 @@ function ChartArt (selector) {
         await setTimeout(() => {
             this._values.forEach((_, index)=> {
                 this.__generatePieAngles(index);
-                this.betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
+                this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
                 this._colors.push(self._result.__getRandomColor());
                 this._pieParts.push(new SinglePies(
                     self._widthCanvas / 2, self._heightCanvas / 2,
@@ -3722,7 +3742,7 @@ function ChartArt (selector) {
                 realAngle = (Math.PI - Math.abs(angle)) + Math.PI
             }
             if (this.__pointInCircleSQRT(event.pageX, event.pageY, self._widthCanvas / 2, self._heightCanvas / 2, this._radius)){
-                this.betweenAngles.map((_angles, _index) => {
+                this._betweenAngles.map((_angles, _index) => {
                     if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
                         if (_prevId !== 'arc_' + _index) {
                             _prevColor = this._pieParts[+('arc_' + _index).split('_')[1]].color;
@@ -3732,14 +3752,40 @@ function ChartArt (selector) {
                                 this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
                                 this._pieParts[+_prevId.split('_')[1]].__draw();
                             }
+
+                            //Rendering if tooltip is true
+                            let _angle = (this._betweenAngles[_index][0] + this._betweenAngles[_index][1]) / 2;
+                            self._canvas.font = '13px Arial';
+                            self._canvas.textAlign = 'left'
+                            const _widthText = self._canvas.measureText(_dataChart[_legendInfo.info2][_index].text).width > (2 * this._radius) - 40
+                                ? (2 * this._radius) - 40 : self._canvas.measureText(_dataChart[_legendInfo.info2][_index].text).width + 30;
+                            const tooltipX = self._widthCanvas / 2 + Math.cos(_angle) * this._radius / 2 - _widthText / 2;
+                            const tooltipY = self._heightCanvas / 2 + Math.sin(_angle) * this._radius / 2 - 10;
+                            self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+                            this._pieParts.map(_class => {
+                                _class.__draw()
+                            });
+                            self._canvas.save();
+                            this._pieParts[+('arc_' + _index).split('_')[1]].__tooltip(
+                                tooltipX,
+                                tooltipY,
+                                _widthText,
+                                _dataChart[_legendInfo.info2][_index].text,
+                                _prevColor
+                                );
+                            self._canvas.restore();
+                            //_____________
                         }
                         _prevId = 'arc_' + _index;
                     }
                 })
             } else {
                 if (_prevId) {
+                    self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
                     this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
-                    this._pieParts[+_prevId.split('_')[1]].__draw();
+                    this._pieParts.map(_class => {
+                        _class.__draw()
+                    });
                 }
                 _prevId = null
             }
