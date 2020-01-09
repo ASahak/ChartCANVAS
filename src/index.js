@@ -524,6 +524,7 @@ function ChartArt (selector) {
             this._totalValues += _.value
         });
         this._pieParts = [];
+        this._labelsPosition = [];
     }
     Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
         const destX = radius * Math.cos(angleRadians) + originX;
@@ -699,7 +700,8 @@ function ChartArt (selector) {
                                 self._canvas.closePath();
 
                                 self._canvas.fillStyle = '#000';
-                                self._canvas.fillText(text, this._cx - (_mainRowWidth[index] / 2 - (_everyX - self._canvas.measureText(text).width)), 25 * (index + 1) + 13);
+                                this._labelsPosition.push({left: _x - 15, top: _y - 13, width: self._canvas.measureText(text).width + 15});
+                                self._canvas.fillText(text, _x, _y);
                             })
                         });
                         this._cy = self._heightCanvas / 2;
@@ -747,63 +749,84 @@ function ChartArt (selector) {
             const diffX = event.pageX - this._cx;
             const diffY = event.pageY - this._cy;
             let angle = Math.atan2(diffY, diffX);
+            let _allowAreaForHover = false;
             let realAngle = angle;
             if (angle < 0) {
                 realAngle = (Math.PI - Math.abs(angle)) + Math.PI
             }
+            if (self._legends_pie) {
+                for (let i = 0; i < this._labelsPosition.length; i++) {
+                    if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                        event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                    ) {
+                        _allowAreaForHover = true;
+                        mouseEnterArae(realAngle, i);
+                        canvas.style.cursor = 'pointer';
+                    }
+                }
+            }
             if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
                 this._betweenAngles.map((_angles, _index) => {
                     if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
-                        if (_prevId !== 'arc_' + _index) {
-                            _prevColor = this._pieParts[+('arc_' + _index).split('_')[1]].color;
-                            if (self._onHover_pie) {
-                                this._pieParts[+('arc_' + _index).split('_')[1]].color = this._pieParts[+('arc_' + _index).split('_')[1]].hoverColor;
-                                this._pieParts[+('arc_' + _index).split('_')[1]].__draw();
-                                if (_prevId) {
-                                    this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
-                                    this._pieParts[+_prevId.split('_')[1]].__draw();
-                                }
-                            }
-
-                            //Rendering if tooltip is true
-                            if (self._tooltip_pie) {
-                                let _angle = (this._betweenAngles[_index][0] + this._betweenAngles[_index][1]) / 2;
-                                self._canvas.font = '13px Arial';
-                                self._canvas.textAlign = 'left'
-                                const _widthText = self._canvas.measureText(this._labels[_index]).width > (2 * this._radius) - 40
-                                    ? (2 * this._radius) - 40 : self._canvas.measureText(this._labels[_index]).width + 30;
-                                const tooltipX = this._cx + Math.cos(_angle) * this._radius / 2 - _widthText / 2;
-                                const tooltipY = this._cy + Math.sin(_angle) * this._radius / 2 - 10;
-                                self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
-                                this._pieParts.map(_class => {
-                                    _class.__draw()
-                                });
-                                self._canvas.save();
-                                this._pieParts[+('arc_' + _index).split('_')[1]].__tooltip(
-                                    tooltipX,
-                                    tooltipY,
-                                    _widthText,
-                                    this._labels[_index],
-                                    _prevColor
-                                    );
-                                self._canvas.restore();
-                            }
-                            //_____________
-                        }
-                        _prevId = 'arc_' + _index;
+                        _allowAreaForHover = true;
+                        canvas.style.cursor = 'pointer';
+                        mouseEnterArae(realAngle, _index);
                     }
                 })
             } else if (self._onHover_pie) {
-                if (_prevId) {
+                !_allowAreaForHover && mouseLeaveArea();
+            }
+        });
+        const mouseEnterArae = (realAngle, _index) => {
+            if (_prevId !== 'arc_' + _index) {
+                _prevColor = this._pieParts[+('arc_' + _index).split('_')[1]].color;
+                if (self._onHover_pie) {
+                    this._pieParts[+('arc_' + _index).split('_')[1]].color = this._pieParts[+('arc_' + _index).split('_')[1]].hoverColor;
+                    this._pieParts[+('arc_' + _index).split('_')[1]].__draw();
+                    if (_prevId) {
+                        this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
+                        this._pieParts[+_prevId.split('_')[1]].__draw();
+                    }
+                }
+
+                //Rendering if tooltip is true
+                if (self._tooltip_pie) {
+                    let _angle = (this._betweenAngles[_index][0] + this._betweenAngles[_index][1]) / 2;
+                    self._canvas.font = '13px Arial';
+                    self._canvas.textAlign = 'left'
+                    const _widthText = self._canvas.measureText(this._labels[_index]).width > (2 * this._radius) - 40
+                        ? (2 * this._radius) - 40 : self._canvas.measureText(this._labels[_index]).width + 30;
+                    const tooltipX = this._cx + Math.cos(_angle) * this._radius / 2 - _widthText / 2;
+                    const tooltipY = this._cy + Math.sin(_angle) * this._radius / 2 - 10;
                     self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
-                    this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
                     this._pieParts.map(_class => {
                         _class.__draw()
                     });
+                    self._canvas.save();
+                    this._pieParts[+('arc_' + _index).split('_')[1]].__tooltip(
+                        tooltipX,
+                        tooltipY,
+                        _widthText,
+                        this._labels[_index],
+                        _prevColor
+                    );
+                    self._canvas.restore();
                 }
-                _prevId = null
+                //_____________
             }
-        });
+            _prevId = 'arc_' + _index;
+        }
+        const mouseLeaveArea = () => {
+            canvas.style.cursor = 'default'
+            if (_prevId) {
+                self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
+                this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
+                this._pieParts.map(_class => {
+                    _class.__draw()
+                });
+            }
+            _prevId = null
+        }
     };
     /*********************************/
 
@@ -921,6 +944,10 @@ function ChartArt (selector) {
                 emptyProperty: 20
             }, {
                 nesting: ['options', 'padding', 'paddingLeft'],
+                value: 50,
+                emptyProperty: 10
+            }, {
+                nesting: ['options', 'padding', 'paddingRight'],
                 value: 50,
                 emptyProperty: 10
             }, {
@@ -1042,7 +1069,7 @@ new ChartArt(canvas).__init({
 //             width: 40
 //         },
 //         padding: {
-//             paddingLeft: 10,
+//             paddingLeft: 70,
 //             paddingRight: 30,
 //             paddingBottom: 10
 //         },
