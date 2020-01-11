@@ -51,84 +51,84 @@ function ChartArt (selector) {
 
     /***************Bar Chart ******************/
     function Bar (options) {
-        this._barsPositions = {};
-        this._gui = new dat.GUI();
-        const barFolder = this._gui.addFolder('Bar');
-        this._configuration = options;
-        this.animateBars = false;
-        self._borderColor = [175, 160, 160];
-        barFolder.addColor(self, '_borderColor')
+        this._barsPositions  = {};
+        this._gui            = new dat.GUI();
+        const barFolder      = this._gui.addFolder('Bar');
+        this._configuration  = options;
+        this.animateBars     = false;
+        self._borderColor    = [175, 160, 160];
+        barFolder.addColor(self, '_borderColor').name('Border Color')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
-        barFolder.add(self, '_borderOpacity', 0, 1)
+        barFolder.add(self, '_borderOpacity', 0, 1).name('Border Opacity')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
-        barFolder.addColor(self, '_axisColor')
+        barFolder.addColor(self, '_axisColor').name('Axis Color')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             })
-        barFolder.add(self, '_axisOpacity', 0, 1)
+        barFolder.add(self, '_axisOpacity', 0, 1).name('Axis Opacity')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             })
-        const _bars = barFolder.addFolder('bars');
-        _bars.add(self._bars, 'width', 20, 60)
+        const _bars = barFolder.addFolder('Bars');
+        _bars.add(self._bars, 'width', 20, 60).name('Width')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
-        _bars.add(self, '_barTooltip')
+        _bars.add(self, '_barTooltip').name(`Bar's Tooltip`)
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
         // Bars Colors ______________
-        _bars.addColor(self._barsColors, 'one')
+        _bars.addColor(self._barsColors, 'one').name('One')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
-        _bars.addColor(self._barsColors, 'two')
+        _bars.addColor(self._barsColors, 'two').name('Two')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
-        _bars.addColor(self._barsColors, 'three')
+        _bars.addColor(self._barsColors, 'three').name('Three')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             });
         //_________________
 
         // Sub Folders
-        const xAxis = barFolder.addFolder('xAxis')
-        xAxis.add(self._labelsX, 'display')
+        const xAxis = barFolder.addFolder('XAxis')
+        xAxis.add(self._labelsX, 'display').name('Display')
             .onChange((e) => {
                 xAxisColor.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
                 xAxisFontSize.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
                 requestAnimationFrame(this.__animate.bind(this))
             })
-        const xAxisFontSize = xAxis.add(self._labelsX, 'fontSize', 10, 26);
+        const xAxisFontSize = xAxis.add(self._labelsX, 'fontSize', 10, 26).name('Font Size');
         xAxisFontSize.onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             })
             .domElement.parentElement.setAttribute('style', `pointer-events: ${self._labelsX.display ? 'auto' : 'none'}; opacity: ${self._labelsX.display ? 1 : 0.5}`);
-        const xAxisColor = xAxis.addColor(self._labelsX, 'color');
+        const xAxisColor = xAxis.addColor(self._labelsX, 'color').name('Color');
         xAxisColor.onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
             })
             .domElement.parentElement.setAttribute('style', `pointer-events: ${self._labelsX.display ? 'auto' : 'none'}; opacity: ${self._labelsX.display ? 1 : 0.5}`);
 
-        const yAxis = barFolder.addFolder('yAxis')
+        const yAxis = barFolder.addFolder('YAxis')
         yAxis.add(self._labelsY, 'display')
             .onChange((e) => {
                 yAxisColor.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
                 yAxisFontSize.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
                 requestAnimationFrame(this.__animate.bind(this))
             })
-        const yAxisFontSize = yAxis.add(self._labelsY, 'fontSize', 10, 26);
+        const yAxisFontSize = yAxis.add(self._labelsY, 'fontSize', 10, 26).name('Font Size');
         yAxisFontSize.onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
             .domElement.parentElement.setAttribute('style', `pointer-events: ${self._labelsY.display ? 'auto' : 'none'}; opacity: ${self._labelsY.display ? 1 : 0.5}`);
-        const yAxisColor = yAxis.addColor(self._labelsY, 'color');
+        const yAxisColor = yAxis.addColor(self._labelsY, 'color').name('Color');
         yAxisColor.onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
         })
@@ -503,28 +503,102 @@ function ChartArt (selector) {
 
     /*******************Pie Chart**********************/
     function Pie (options) {
-        this._gui = new dat.GUI();
-        const _pieFolder = this._gui.addFolder('Pie');
-        this._configuration = options;
-        this._animateRadius = false;
-        this._values = [];
-        this._radius = 150;
-        this._colors = [];
-        this._angles = {
+        this._gui            = new dat.GUI();
+        this._configuration  = options;
+        this._animateRadius  = false;
+        this._values         = [];
+        this._radius         = 150;
+        this._colors         = [];
+        this._angles         = {
             begin:[],
             end:[]
         };
-        this._betweenAngles = [];
-        this._countPies = -1;
-        this._totalValues = 0;
-        this._labels = [];
+        this._betweenAngles  = [];
+        this._countPies      = -1;
+        this._totalValues    = 0;
+        this._labels         = [];
+        this._legendSize     = null;
+        this._cx             = this._radius;
+        this._cy             = this._radius;
         _dataChart[_legendInfo.info2].map(_ => {
             this._labels.push(_.text);
             this._values.push(_.value);
             this._totalValues += _.value
         });
-        this._pieParts = [];
+        this._pieParts       = [];
         this._labelsPosition = [];
+        
+        const _pieFolder     = this._gui.addFolder('Pie');
+        _pieFolder.add(self, '_lineWidth_pie', 0.1, 3).name('Space of Pies')
+            .onChange(() => {
+                this._pieParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        const _legends = _pieFolder.addFolder('Legends');
+        _legends.add(self._legends_pie, 'display').name('Display')
+            .onChange((e) => {
+                this.__init()
+            })
+        let fakePosition = {
+            top: false,
+            left: false,
+            bottom: false,
+            right: false,
+        }
+        fakePosition[self._legends_position_pie] = true;
+        const _legendsPosition = _legends.addFolder('Position');
+        _legendsPosition.add(fakePosition, 'top').name('Top').listen()
+            .onChange((e) => {
+                setChecked("top");
+                if (e) {
+                    self._legends_position_pie = 'top'
+                    this.__init()
+                }
+            })
+        _legendsPosition.add(fakePosition, 'left').name('Left').listen()
+            .onChange((e) => {
+                setChecked("left");
+                if (e) {
+                    self._legends_position_pie = 'left'
+                    this.__init()
+                }
+            })
+        _legendsPosition.add(fakePosition, 'bottom').name('Bottom').listen()
+            .onChange((e) => {
+                setChecked("bottom");
+                if (e) {
+                    self._legends_position_pie = 'bottom'
+                    this.__init()
+                }
+            })
+        _legendsPosition.add(fakePosition, 'right').name('Right').listen()
+            .onChange((e) => {
+                setChecked("right");
+                if (e) {
+                    self._legends_position_pie = 'right'
+                    this.__init()
+                }
+            })
+        function setChecked( prop ){
+            for (let param in fakePosition){
+                fakePosition[param] = false;
+            }
+            fakePosition[prop] = true;
+        }
+        _pieFolder.add(self, '_onHover_pie').name('Hover Pie')
+            .onChange(() => {
+                this._pieParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        _pieFolder.add(self, '_tooltip_pie').name('Hover Tooltip')
+            .onChange(() => {
+                this._pieParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        _pieFolder.open();
     }
     Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
         const destX = radius * Math.cos(angleRadians) + originX;
@@ -549,15 +623,15 @@ function ChartArt (selector) {
         }
     };
     function SinglePies (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor) {
-        this.movingX = movingX;
-        this.movingY = movingY;
-        this.color = color;
+        this.movingX    = movingX;
+        this.movingY    = movingY;
+        this.color      = color;
         this.leaveColor = color;
         this.hoverColor = hoverColor;
         this.startAngle = startAngle;
-        this.endAngle = endAngle;
-        this.radius = 0;
-        this.index = index;
+        this.endAngle   = endAngle;
+        this.radius     = 0;
+        this.index      = index;
     }
     /*****this one is one of the some animation examples (from arc to center)*****/
     Pie.prototype.__movingPies = function () {
@@ -600,11 +674,10 @@ function ChartArt (selector) {
     };
     SinglePies.prototype.__draw = function () {
         self._canvas.fillStyle = this.color;
-        self._canvas.lineWidth = 1;
+        self._canvas.lineWidth = self._lineWidth_pie;
         self._canvas.beginPath();
         self._canvas.moveTo(this.movingX, this.movingY);
         self._canvas.arc(this.movingX, this.movingY, this.radius, this.startAngle, this.endAngle, false);
-        // self._canvas.closePath();
         self._canvas.lineTo(this.movingX, this.movingY);
         self._canvas.fill();
         self._canvas.strokeStyle = '#fff';
@@ -612,21 +685,18 @@ function ChartArt (selector) {
         self._canvas.beginPath();
         self._canvas.save();
         self._canvas.translate(this.movingX, this.movingY);
-        // ctx.font = middle.radius / 10 + "px Arial";
-        // ctx.rotate(previousRadian + obj.radian);
         self._canvas.restore();
-        // var labelText = "'" + obj.label + "' " + parseInt((values[i] / total) * 100) + "%";
-        // self._canvas.fillText(labelText, self._canvas.measureText(labelText).width/2, 0);
     };
-    SinglePies.prototype.__tooltip = function (x, y, width ,text, quadroFill) {
+    SinglePies.prototype.__tooltip = function (x, y, widthText, widthValue, text, values, quadroFill) {
         self._canvas.beginPath();
-        self._canvas.rect(x, y, width, 20);
+        self._canvas.rect(x, y, Math.max(...[widthText, widthValue]), 30);
         self._canvas.fillStyle = 'rgb(0,0,0)';
         self._canvas.globalAlpha = .8
         self._canvas.fill();
         self._canvas.strokeStyle = '#fff';
         self._canvas.fillStyle = '#fff';
-        self._canvas.fillText(self._result.__fittingString(self._canvas, text, width), x + 20, y + 14);
+        self._canvas.fillText(self._result.__fittingString(self._canvas, text, Math.max(...[widthText, widthValue])), x + 20, y + 12);
+        self._canvas.fillText(self._result.__fittingString(self._canvas, values, widthValue), x + 20, y + 24);
         self._canvas.clearColor;
         self._canvas.stroke();
         self._canvas.closePath();
@@ -659,20 +729,27 @@ function ChartArt (selector) {
         return distSq <= radius;
     };
     Pie.prototype.__init = async function () {
+        this._countPies = -1;
+        this._pieParts = [];
+        this._betweenAngles = [];
+        this._labelsPosition = [];
+        this._colors = [];
+        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
         await setTimeout(() => {
             this._labels.map(_j => this._colors.push(self._result.__getRandomColor()));
             (() => {
-                if (self._legends_pie) {
-                    if (self._legends_position_pie === 'top') {
-                        const _paddingLeft = 20;
-                        this._cx = this._radius + _paddingLeft;
-                        self._canvas.font = '13px Arial';
+                if (self._legends_pie.display) {
+                    this._legendSize = 13;
+                    const __drawLegendsByPositionVertical = (position) => {
+                        let _topCY = 0;
+                        this._cx = self._widthCanvas / 2;
+                        self._canvas.font = this._legendSize + 'px Arial';
                         let _levels = [[]];
                         let _levelsCount = 0;
                         let _mainRowWidth = [0];
                         this._labels.map((item, index) => {
                             let _x = index === 0 ? 15 : 25;
-                            if (this._labels[index + 1] && _mainRowWidth[_levelsCount] + self._canvas.measureText(this._labels[index + 1]).width + _x > this._cx + this._radius - _paddingLeft) {
+                            if (this._labels[index + 1] && _mainRowWidth[_levelsCount] + self._canvas.measureText(this._labels[index + 1]).width + _x > 2 * this._radius) {
                                 _levelsCount++;
                                 _mainRowWidth[_levelsCount] = 0;
                                 _levels[_levelsCount] = [];
@@ -690,7 +767,9 @@ function ChartArt (selector) {
                                     let _x = i === 0 ? 15 : 25;
                                     _everyX+=self._canvas.measureText(items[i]).width + _x;
                                 }
-                                const [_x, _y] = [this._cx - (_mainRowWidth[index] / 2 - (_everyX - self._canvas.measureText(text).width)), 25 * (index + 1) + 13];
+                                const [_x, _y] = [this._cx - (_mainRowWidth[index] / 2 - (_everyX - self._canvas.measureText(text).width)), 
+                                (25 * (index + 1) + this._legendSize) + 
+                                ((position === 'bottom') ? 2 * this._radius + this._legendSize : 0)];
                                 self._canvas.beginPath();
                                 self._canvas.lineWidth = 2;
                                 self._canvas.rect(_x - 15, _y - 10, 10, 10);
@@ -700,17 +779,55 @@ function ChartArt (selector) {
                                 self._canvas.closePath();
 
                                 self._canvas.fillStyle = '#000';
-                                this._labelsPosition.push({left: _x - 15, top: _y - 13, width: self._canvas.measureText(text).width + 15});
+                                this._labelsPosition.push({left: _x - 15, top: _y - this._legendSize, width: self._canvas.measureText(text).width + 15});
                                 self._canvas.fillText(text, _x, _y);
                             })
+                            if (position === 'top') _topCY = 25 * (index + 1) + this._legendSize + 20/* just paddingTop 20px */
+                            else _topCY = 20/* just paddingTop 20px */ 
                         });
+                        this._cy = _topCY + this._radius;
+                    };
+                    const __drawLegendsByPositionHorizontal = (position) => {
                         this._cy = self._heightCanvas / 2;
+                        self._canvas.font = this._legendSize + 'px Arial';
+                        let _mainLabelsHeight = 0;
+                        let _widthTexts = [];
+                        let _cx = null;
+                        this._labels.map(_ => {
+                            _mainLabelsHeight+=this._legendSize + 10; 
+                            _widthTexts.push(self._canvas.measureText(_).width + 15)
+                        });
+                        if (position === 'right') {
+                            _cx = self._widthCanvas / 2 - (25 + Math.max(..._widthTexts) / 2)
+                        } else if (position === 'left') {
+                            _cx = self._widthCanvas / 2 + (25 + Math.max(..._widthTexts) / 2)
+                        }
+                        const _beginY = self._heightCanvas / 2 - _mainLabelsHeight / 2;
+                        this._labels.map((item, index) => {
+                            const [_x, _y] = [
+                                position === 'left' ? (_cx - (this._radius + Math.max(..._widthTexts) + 30)) : _cx + (this._radius + 60/* + 15 for square width */),
+                                _beginY + (index + 1) * (this._legendSize + 10)];
+                            self._canvas.beginPath();
+                            self._canvas.lineWidth = 2;
+                            self._canvas.rect(_x - 15, _y - 10, 10, 10);
+                            self._canvas.fillStyle = this._colors[index];
+                            self._canvas.globalAlpha = 1;
+                            self._canvas.fill();
+                            self._canvas.closePath();
+                            this._labelsPosition.push({left: _x - 15, top: _y - this._legendSize, width: self._canvas.measureText(item).width + 15});
+                            self._canvas.fillStyle = '#000';
+                            self._canvas.fillText(item, _x, _y);
+                        });
+                        this._cx = _cx; 
+                    };
+                    if (self._legends_position_pie === 'top') {
+                        __drawLegendsByPositionVertical('top');
                     } else if (self._legends_position_pie === 'bottom') {
-
+                        __drawLegendsByPositionVertical('bottom');
                     } else if (self._legends_position_pie === 'right') {
-
+                        __drawLegendsByPositionHorizontal('right');
                     } else if (self._legends_position_pie === 'left') {
-
+                        __drawLegendsByPositionHorizontal('left');
                     }
                 } else {
                     this._cx = self._widthCanvas / 2;
@@ -754,14 +871,14 @@ function ChartArt (selector) {
             if (angle < 0) {
                 realAngle = (Math.PI - Math.abs(angle)) + Math.PI
             }
-            if (self._legends_pie) {
+            if (self._legends_pie.display) {
                 for (let i = 0; i < this._labelsPosition.length; i++) {
                     if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
                         event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
                     ) {
                         _allowAreaForHover = true;
-                        mouseEnterArae(realAngle, i);
                         canvas.style.cursor = 'pointer';
+                        mouseEnterArae(realAngle, i);
                     }
                 }
             }
@@ -789,14 +906,16 @@ function ChartArt (selector) {
                     }
                 }
 
+                const MesureText = (arr, _index) => {
+                    return self._canvas.measureText(arr[_index]).width > (2 * this._radius) - 40
+                    ? (2 * this._radius) - 40 : self._canvas.measureText(arr[_index]).width + 30;
+                }
                 //Rendering if tooltip is true
                 if (self._tooltip_pie) {
                     let _angle = (this._betweenAngles[_index][0] + this._betweenAngles[_index][1]) / 2;
-                    self._canvas.font = '13px Arial';
+                    self._canvas.font = '11px Arial';
                     self._canvas.textAlign = 'left'
-                    const _widthText = self._canvas.measureText(this._labels[_index]).width > (2 * this._radius) - 40
-                        ? (2 * this._radius) - 40 : self._canvas.measureText(this._labels[_index]).width + 30;
-                    const tooltipX = this._cx + Math.cos(_angle) * this._radius / 2 - _widthText / 2;
+                    const tooltipX = this._cx + Math.cos(_angle) * this._radius / 2 - MesureText(this._labels, _index) / 2;
                     const tooltipY = this._cy + Math.sin(_angle) * this._radius / 2 - 10;
                     self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
                     this._pieParts.map(_class => {
@@ -806,8 +925,10 @@ function ChartArt (selector) {
                     this._pieParts[+('arc_' + _index).split('_')[1]].__tooltip(
                         tooltipX,
                         tooltipY,
-                        _widthText,
+                        MesureText(this._labels, _index),
+                        MesureText(this._values, _index),
                         this._labels[_index],
+                        this._values[_index],
                         _prevColor
                     );
                     self._canvas.restore();
@@ -984,6 +1105,10 @@ function ChartArt (selector) {
                 nesting: ['options', 'centerSize'],
                 value: 100,
                 emptyProperty: 50
+            }, {
+                nesting: ['options', 'lineWidth'],
+                value: 3,
+                emptyProperty: 0.1
             }].forEach(_ => self.constructor.__maxValue(_, options))
         }
     }
@@ -1015,9 +1140,10 @@ function ChartArt (selector) {
         //~~~~~~~~~~~~~~~~~~~~~~
 
         // For Pie Chart ~~~~~~~~~~~~~~~~~~~
+        self._lineWidth_pie           = parameters.options.lineWidth || 0.1;
         self._onHover_pie             = parameters.options.onHover && parameters.options.onHover.event;
         self._tooltip_pie             = parameters.options.onHover && parameters.options.onHover.tooltip;
-        self._legends_pie             = parameters.data.datasets.legends && parameters.data.datasets.legends.display;
+        self._legends_pie             = parameters.data.datasets.legends;
         self._legends_position_pie    = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
         //~~~~~~~~~~~~~~~~~~~~~~
         self._result = new Result(selector, parameters);
@@ -1034,12 +1160,13 @@ new ChartArt(canvas).__init({
         datasets: {
             legends: {
                 display: true,
-                position: 'top'
+                position: 'bottom'
             },
             data: _dataChart[_legendInfo.info2],
         }
     },
     options: {
+        lineWidth: 1,
         onHover: {
             event: true,
             tooltip: true
