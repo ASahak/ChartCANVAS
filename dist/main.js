@@ -3089,10 +3089,13 @@ function ChartArt (selector) {
     this._widthCanvas       = 800;
     function Result (elem, options) {
         if (options) {
-            // this.bar = new Bar(options);
+            // this.bar     = new Bar(options);
             // this.bar.__init();
-            this.pie = new Pie(options);
-            this.pie.__init();
+            // this.pie     = new Pie(options);
+            // this.pie.__init();
+             this.polar   = new Polar(options);
+            Object.assign(this.polar.__proto__, Pie.prototype);
+            this.polar.__initP();
         }
     }
 
@@ -3546,13 +3549,11 @@ function ChartArt (selector) {
         }
         //______________________________________
     };
-    // ****************************
+    // ***************Bar End*************
 
     /*******************Pie Chart**********************/
     function Pie (options) {
         this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
-        this._configuration  = options;
-        this._animateRadius  = false;
         this._values         = [];
         this._radius         = 150;
         this._colors         = [];
@@ -3561,7 +3562,6 @@ function ChartArt (selector) {
             end:[]
         };
         this._betweenAngles  = [];
-        this._countPies      = -1;
         this._totalValues    = 0;
         this._labels         = [];
         this._legendSize     = null;
@@ -3574,7 +3574,8 @@ function ChartArt (selector) {
         });
         this._pieParts       = [];
         this._labelsPosition = [];
-        
+        this._prevId         = null;
+        this._prevColor      = null;
         const _pieFolder     = this._gui.addFolder('Pie');
         _pieFolder.add(self, '_lineWidth_pie', 0.1, 3).name('Space of Pies')
             .onChange(() => {
@@ -3586,13 +3587,13 @@ function ChartArt (selector) {
         _legends.add(self._legends_pie, 'display').name('Display')
             .onChange((e) => {
                 this.__init()
-            })
+            });
         let fakePosition = {
             top: false,
             left: false,
             bottom: false,
             right: false,
-        }
+        };
         fakePosition[self._legends_position_pie] = true;
         const _legendsPosition = _legends.addFolder('Position');
         _legendsPosition.add(fakePosition, 'top').name('Top').listen()
@@ -3602,7 +3603,7 @@ function ChartArt (selector) {
                     self._legends_position_pie = 'top'
                     this.__init()
                 }
-            })
+            });
         _legendsPosition.add(fakePosition, 'left').name('Left').listen()
             .onChange((e) => {
                 setChecked("left");
@@ -3610,7 +3611,7 @@ function ChartArt (selector) {
                     self._legends_position_pie = 'left'
                     this.__init()
                 }
-            })
+            });
         _legendsPosition.add(fakePosition, 'bottom').name('Bottom').listen()
             .onChange((e) => {
                 setChecked("bottom");
@@ -3618,7 +3619,7 @@ function ChartArt (selector) {
                     self._legends_position_pie = 'bottom'
                     this.__init()
                 }
-            })
+            });
         _legendsPosition.add(fakePosition, 'right').name('Right').listen()
             .onChange((e) => {
                 setChecked("right");
@@ -3626,7 +3627,7 @@ function ChartArt (selector) {
                     self._legends_position_pie = 'right'
                     this.__init()
                 }
-            })
+            });
         function setChecked( prop ){
             for (let param in fakePosition){
                 fakePosition[param] = false;
@@ -3669,17 +3670,6 @@ function ChartArt (selector) {
             })())
         }
     };
-    function SinglePies (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor) {
-        this.movingX    = movingX;
-        this.movingY    = movingY;
-        this.color      = color;
-        this.leaveColor = color;
-        this.hoverColor = hoverColor;
-        this.startAngle = startAngle;
-        this.endAngle   = endAngle;
-        this.radius     = 0;
-        this.index      = index;
-    }
     /*****this one is one of the some animation examples (from arc to center)*****/
     Pie.prototype.__movingPies = function () {
         const _newCoords = this.__findPointOnCircle(
@@ -3719,20 +3709,29 @@ function ChartArt (selector) {
         context.clearRect(x-radius,y-radius,radius*2,radius*2);
         context.restore();
     };
-    SinglePies.prototype.__draw = function () {
-        self._canvas.fillStyle = this.color;
-        self._canvas.lineWidth = self._lineWidth_pie;
-        self._canvas.beginPath();
-        self._canvas.moveTo(this.movingX, this.movingY);
-        self._canvas.arc(this.movingX, this.movingY, this.radius, this.startAngle, this.endAngle, false);
-        self._canvas.lineTo(this.movingX, this.movingY);
-        self._canvas.fill();
-        self._canvas.strokeStyle = '#fff';
-        self._canvas.stroke();
-        self._canvas.beginPath();
-        self._canvas.save();
-        self._canvas.translate(this.movingX, this.movingY);
-        self._canvas.restore();
+    function SinglePies (_x, _y, everyAngle, startAngle, endAngle, radius, color, index, hoverColor) {
+        this._everyAngle    = everyAngle;
+        this._endAngle      = endAngle;
+        this._x             = _x;
+        this._y             = _y;
+        this._startAngle    = startAngle;
+        this._limitAngle    = startAngle;
+        this._index         = index;
+        this._radius        = radius;
+        this._color         = color;
+        this._leaveColor    = color;
+        this._hoverColor    = hoverColor;
+    }
+    SinglePies.prototype.__update = function () {
+        console.log(this._everyAngle, this._endAngle)
+        const $interval = window.setInterval(() => {
+            if (this._limitAngle >= this._endAngle) {
+                window.clearInterval($interval);
+            } else {
+                this._limitAngle+=this._everyAngle
+                this.__draw()
+            }
+        }, 30);
     };
     SinglePies.prototype.__tooltip = function (x, y, widthText, widthValue, text, values, quadroFill) {
         self._canvas.beginPath();
@@ -3756,27 +3755,180 @@ function ChartArt (selector) {
         self._canvas.fill();
         self._canvas.closePath();
     };
-    SinglePies.prototype.__update = function (_constructor) {
-        // self.constructor.__maxValueInit(this._configuration)
-        const $interval = window.setInterval(() => {
-            if (this.radius >= self._result.pie._radius) {
-                window.clearInterval($interval);
-            } else {
-                this.radius+=3;
-                this.__draw()
-            }
-        }, 10);
-    };
-    Pie.prototype.__animate = function () {
-        this._countPies++;
-        this._pieParts[this._countPies].__update(this._pieParts[this._countPies]);
+    SinglePies.prototype.__draw = function () {
+        self._canvas.fillStyle = this._color;
+        self._canvas.lineWidth = 1;
+
+        self._canvas.moveTo(this._x, this._y);
+        self._canvas.arc(this._x, this._y, this._radius / 2, this._startAngle, this._limitAngle, false);
+        self._canvas.lineTo(this._x, this._y);
+
+        self._canvas.beginPath();
+        self._canvas.moveTo(this._x, this._y);
+        self._canvas.arc(this._x, this._y, this._radius, this._startAngle, this._limitAngle, false);
+        self._canvas.lineTo(this._x, this._y);
+        self._canvas.fill('evenodd');
+        self._canvas.strokeStyle = '#fff';
+        self._canvas.stroke();
+        self._canvas.beginPath();
+        self._canvas.save();
+        self._canvas.translate(this._x, this._y);
+        self._canvas.restore();
     };
     Pie.prototype.__pointInCircleSQRT = function (x, y, cx, cy, radius) {
         const distSq = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
         return distSq <= radius;
     };
+    Pie.prototype.__mouseEnterArea = function (realAngle, _index, _hint, _constructor, type, _condition) {
+        if (_constructor._prevId !== 'arc_' + _index) {
+            _constructor._prevColor = _constructor[_hint][+('arc_' + _index).split('_')[1]]._color;
+            if (self['_onHover_' + type]) {
+                _constructor[_hint][+('arc_' + _index).split('_')[1]]._color = _constructor[_hint][+('arc_' + _index).split('_')[1]]._hoverColor;
+                _constructor[_hint][+('arc_' + _index).split('_')[1]].__draw();
+                if (_constructor._prevId) {
+                    _constructor[_hint][+_constructor._prevId.split('_')[1]]._color = _constructor[_hint][+_constructor._prevId.split('_')[1]]._leaveColor;
+                    _constructor[_hint][+_constructor._prevId.split('_')[1]].__draw();
+                }
+            }
+
+            const MesureText = (arr, _index) => {
+                return self._canvas.measureText(arr[_index]).width > (2 * _constructor._radius) - 40
+                    ? (2 * _constructor._radius) - 40 : self._canvas.measureText(arr[_index]).width + 30;
+            };
+            //Rendering if tooltip is true
+            if (self['_tooltip_' + type]) {
+                let _angle = (_constructor._betweenAngles[_index][0] + _constructor._betweenAngles[_index][1]) / 2;
+                self._canvas.font = '11px Arial';
+                self._canvas.textAlign = 'left';
+                const tooltipX = _constructor._cx + Math.cos(_angle) * _constructor[_hint][_index]._radius / 2 - MesureText(_constructor._labels, _index) / 2;
+                const tooltipY = _constructor._cy + Math.sin(_angle) * _constructor[_hint][_index]._radius / 2 - 10;
+                self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+                _constructor[_hint].map(_class => {
+                    _class.__draw()
+                });
+                self._canvas.save();
+                _constructor[_hint][+('arc_' + _index).split('_')[1]].__tooltip(
+                    tooltipX,
+                    tooltipY,
+                    MesureText(_constructor._labels, _index),
+                    MesureText(_constructor._values, _index),
+                    _constructor._labels[_index],
+                    _constructor._values[_index],
+                    _constructor._prevColor
+                );
+                self._canvas.restore();
+                this.__generateLabelsAfterClearing(this, _condition);
+            }
+            //_____________
+        }
+        _constructor._prevId = 'arc_' + _index;
+    };
+    Pie.prototype.__mouseLeaveArea = function (_constructor, _hint, _condition) {
+        canvas.style.cursor = 'default';
+        if (_constructor._prevId) {
+            self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+            _constructor[_hint][+_constructor._prevId.split('_')[1]]._color = _constructor._prevColor;
+            _constructor[_hint].map(_class => {
+                _class.__draw()
+            });
+            this.__generateLabelsAfterClearing(this, _condition);
+        }
+        _constructor._prevId = null
+    };
+    Pie.prototype.__generateLabelsAfterClearing = function (_constructor, _condition) {
+        _constructor._legendSize = 13;
+        if (_condition === 'top') {
+            this.__drawLegendsByPositionVertical(_constructor,'top');
+        } else if (_condition === 'bottom') {
+            this.__drawLegendsByPositionVertical(_constructor,'bottom');
+        } else if (_condition === 'right') {
+            this.__drawLegendsByPositionHorizontal(_constructor,'right');
+        } else if (_condition === 'left') {
+            this.__drawLegendsByPositionHorizontal(_constructor, 'left');
+        }
+    };
+    Pie.prototype. __drawLegendsByPositionVertical = function (_constructor, position) {
+        _constructor._labelsPosition = [];
+        let _topCY = 0;
+        _constructor._cx = self._widthCanvas / 2;
+        self._canvas.font = this._legendSize + 'px Arial';
+        let _levels = [[]];
+        let _levelsCount = 0;
+        let _mainRowWidth = [0];
+        _constructor._labels.map((item, index) => {
+            let _x = index === 0 ? 15 : 25;
+            if (_constructor._labels[index + 1] && _mainRowWidth[_levelsCount] + self._canvas.measureText(_constructor._labels[index + 1]).width + _x > 2 * _constructor._radius) {
+                _levelsCount++;
+                _mainRowWidth[_levelsCount] = 0;
+                _levels[_levelsCount] = [];
+                _x = 15;
+            }
+            _mainRowWidth[_levelsCount]+=self._canvas.measureText(_constructor._labels[index]).width + _x;
+            _levels[_levelsCount].push(item);
+        });
+        let _fakeIndex = -1;
+        _levels.forEach((items, index) => {
+            items.map((text, ind) => {
+                _fakeIndex++;
+                let _everyX = 0;
+                for (let i = 0; i <= ind; i++) {
+                    let _x = i === 0 ? 15 : 25;
+                    _everyX+=self._canvas.measureText(items[i]).width + _x;
+                }
+                const [_x, _y] = [_constructor._cx - (_mainRowWidth[index] / 2 - (_everyX - self._canvas.measureText(text).width)),
+                    (25 * (index + 1) + _constructor._legendSize) +
+                    ((position === 'bottom') ? 2 * _constructor._radius + _constructor._legendSize : 0)];
+                self._canvas.beginPath();
+                self._canvas.lineWidth = 2;
+                self._canvas.rect(_x - 15, _y - 10, 10, 10);
+                self._canvas.fillStyle = _constructor._colors[_fakeIndex];
+                self._canvas.globalAlpha = 1;
+                self._canvas.fill();
+                self._canvas.closePath();
+
+                self._canvas.fillStyle = '#000';
+                _constructor._labelsPosition.push({left: _x - 15, top: _y - _constructor._legendSize, width: self._canvas.measureText(text).width + 15});
+                self._canvas.fillText(text, _x, _y);
+            })
+            if (position === 'top') _topCY = 25 * (index + 1) + _constructor._legendSize + 20/* just paddingTop 20px */
+            else _topCY = 20/* just paddingTop 20px */
+        });
+        this._cy = _topCY + this._radius;
+    };
+    Pie.prototype.__drawLegendsByPositionHorizontal = function (_constructor, position) {
+        _constructor._cy = self._heightCanvas / 2;
+        self._canvas.font = _constructor._legendSize + 'px Arial';
+        let _mainLabelsHeight = 0;
+        let _widthTexts = [];
+        let _cx = null;
+        _constructor._labels.map(_ => {
+            _mainLabelsHeight+=_constructor._legendSize + 10;
+            _widthTexts.push(self._canvas.measureText(_).width + 15)
+        });
+        if (position === 'right') {
+            _cx = self._widthCanvas / 2 - (25 + Math.max(..._widthTexts) / 2)
+        } else if (position === 'left') {
+            _cx = self._widthCanvas / 2 + (25 + Math.max(..._widthTexts) / 2)
+        }
+        const _beginY = self._heightCanvas / 2 - _mainLabelsHeight / 2;
+        _constructor._labels.map((item, index) => {
+            const [_x, _y] = [
+                position === 'left' ? (_cx - (_constructor._radius + Math.max(..._widthTexts) + 30)) : _cx + (_constructor._radius + 60/* + 15 for square width */),
+                _beginY + (index + 1) * (_constructor._legendSize + 10)];
+            self._canvas.beginPath();
+            self._canvas.lineWidth = 2;
+            self._canvas.rect(_x - 15, _y - 10, 10, 10);
+            self._canvas.fillStyle = _constructor._colors[index];
+            self._canvas.globalAlpha = 1;
+            self._canvas.fill();
+            self._canvas.closePath();
+            _constructor._labelsPosition.push({left: _x - 15, top: _y - _constructor._legendSize, width: self._canvas.measureText(item).width + 15});
+            self._canvas.fillStyle = '#000';
+            self._canvas.fillText(item, _x, _y);
+        });
+        _constructor._cx = _cx;
+    };
     Pie.prototype.__init = async function () {
-        this._countPies = -1;
         this._pieParts = [];
         this._betweenAngles = [];
         this._labelsPosition = [];
@@ -3786,96 +3938,7 @@ function ChartArt (selector) {
             this._labels.map(_j => this._colors.push(self._result.__getRandomColor()));
             (() => {
                 if (self._legends_pie.display) {
-                    this._legendSize = 13;
-                    const __drawLegendsByPositionVertical = (position) => {
-                        let _topCY = 0;
-                        this._cx = self._widthCanvas / 2;
-                        self._canvas.font = this._legendSize + 'px Arial';
-                        let _levels = [[]];
-                        let _levelsCount = 0;
-                        let _mainRowWidth = [0];
-                        this._labels.map((item, index) => {
-                            let _x = index === 0 ? 15 : 25;
-                            if (this._labels[index + 1] && _mainRowWidth[_levelsCount] + self._canvas.measureText(this._labels[index + 1]).width + _x > 2 * this._radius) {
-                                _levelsCount++;
-                                _mainRowWidth[_levelsCount] = 0;
-                                _levels[_levelsCount] = [];
-                                _x = 15;
-                            }
-                            _mainRowWidth[_levelsCount]+=self._canvas.measureText(this._labels[index]).width + _x;
-                            _levels[_levelsCount].push(item);
-                        });
-                        let _fakeIndex = -1;
-                        _levels.forEach((items, index) => {
-                            items.map((text, ind) => {
-                                _fakeIndex++;
-                                let _everyX = 0;
-                                for (let i = 0; i <= ind; i++) {
-                                    let _x = i === 0 ? 15 : 25;
-                                    _everyX+=self._canvas.measureText(items[i]).width + _x;
-                                }
-                                const [_x, _y] = [this._cx - (_mainRowWidth[index] / 2 - (_everyX - self._canvas.measureText(text).width)), 
-                                (25 * (index + 1) + this._legendSize) + 
-                                ((position === 'bottom') ? 2 * this._radius + this._legendSize : 0)];
-                                self._canvas.beginPath();
-                                self._canvas.lineWidth = 2;
-                                self._canvas.rect(_x - 15, _y - 10, 10, 10);
-                                self._canvas.fillStyle = this._colors[_fakeIndex];
-                                self._canvas.globalAlpha = 1;
-                                self._canvas.fill();
-                                self._canvas.closePath();
-
-                                self._canvas.fillStyle = '#000';
-                                this._labelsPosition.push({left: _x - 15, top: _y - this._legendSize, width: self._canvas.measureText(text).width + 15});
-                                self._canvas.fillText(text, _x, _y);
-                            })
-                            if (position === 'top') _topCY = 25 * (index + 1) + this._legendSize + 20/* just paddingTop 20px */
-                            else _topCY = 20/* just paddingTop 20px */ 
-                        });
-                        this._cy = _topCY + this._radius;
-                    };
-                    const __drawLegendsByPositionHorizontal = (position) => {
-                        this._cy = self._heightCanvas / 2;
-                        self._canvas.font = this._legendSize + 'px Arial';
-                        let _mainLabelsHeight = 0;
-                        let _widthTexts = [];
-                        let _cx = null;
-                        this._labels.map(_ => {
-                            _mainLabelsHeight+=this._legendSize + 10; 
-                            _widthTexts.push(self._canvas.measureText(_).width + 15)
-                        });
-                        if (position === 'right') {
-                            _cx = self._widthCanvas / 2 - (25 + Math.max(..._widthTexts) / 2)
-                        } else if (position === 'left') {
-                            _cx = self._widthCanvas / 2 + (25 + Math.max(..._widthTexts) / 2)
-                        }
-                        const _beginY = self._heightCanvas / 2 - _mainLabelsHeight / 2;
-                        this._labels.map((item, index) => {
-                            const [_x, _y] = [
-                                position === 'left' ? (_cx - (this._radius + Math.max(..._widthTexts) + 30)) : _cx + (this._radius + 60/* + 15 for square width */),
-                                _beginY + (index + 1) * (this._legendSize + 10)];
-                            self._canvas.beginPath();
-                            self._canvas.lineWidth = 2;
-                            self._canvas.rect(_x - 15, _y - 10, 10, 10);
-                            self._canvas.fillStyle = this._colors[index];
-                            self._canvas.globalAlpha = 1;
-                            self._canvas.fill();
-                            self._canvas.closePath();
-                            this._labelsPosition.push({left: _x - 15, top: _y - this._legendSize, width: self._canvas.measureText(item).width + 15});
-                            self._canvas.fillStyle = '#000';
-                            self._canvas.fillText(item, _x, _y);
-                        });
-                        this._cx = _cx; 
-                    };
-                    if (self._legends_position_pie === 'top') {
-                        __drawLegendsByPositionVertical('top');
-                    } else if (self._legends_position_pie === 'bottom') {
-                        __drawLegendsByPositionVertical('bottom');
-                    } else if (self._legends_position_pie === 'right') {
-                        __drawLegendsByPositionHorizontal('right');
-                    } else if (self._legends_position_pie === 'left') {
-                        __drawLegendsByPositionHorizontal('left');
-                    }
+                    this.__generateLabelsAfterClearing(this, self._legends_position_pie);
                 } else {
                     this._cx = self._widthCanvas / 2;
                     this._cy = self._heightCanvas / 2;
@@ -3886,6 +3949,7 @@ function ChartArt (selector) {
                 this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
                 this._pieParts.push(new SinglePies(
                     this._cx, this._cy,
+                    (this._angles.end[index] - this._angles.begin[index]) / 30,
                     this._angles.begin[index],
                     this._angles.end[index],
                     this._radius,
@@ -3893,22 +3957,9 @@ function ChartArt (selector) {
                     index,
                     self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
                 ));
+                this._pieParts[index].__update()
             });
-            const $syncInterval = setInterval(() => {
-                if (this._countPies < this._pieParts.length - 1) {
-                    this.__animate();
-                } else {
-                    clearInterval($syncInterval);
-                    setTimeout(() => {
-                        this._pieParts.map(_class => {
-                            _class.__draw()
-                        })
-                    }, 500)
-                }
-            }, 200)
         }, 0);
-        let _prevId = null;
-        let _prevColor = null;
         await canvas.addEventListener('mousemove', (event) => {
             const diffX = event.pageX - this._cx;
             const diffY = event.pageY - this._cy;
@@ -3925,7 +3976,7 @@ function ChartArt (selector) {
                     ) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        mouseEnterArae(realAngle, i);
+                        this.__mouseEnterArea(realAngle, i, '_pieParts', this, 'pie', self._legends_position_pie);
                     }
                 }
             }
@@ -3934,69 +3985,199 @@ function ChartArt (selector) {
                     if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        mouseEnterArae(realAngle, _index);
+                        this.__mouseEnterArea(realAngle, _index, '_pieParts', this, 'pie', self._legends_position_pie);
                     }
                 })
-            } else if (self._onHover_pie) {
-                !_allowAreaForHover && mouseLeaveArea();
+            } else if (self._onHover_pie || this._prevId) {
+                !_allowAreaForHover && this.__mouseLeaveArea(this, '_pieParts', self._legends_position_pie);
             }
         });
-        const mouseEnterArae = (realAngle, _index) => {
-            if (_prevId !== 'arc_' + _index) {
-                _prevColor = this._pieParts[+('arc_' + _index).split('_')[1]].color;
-                if (self._onHover_pie) {
-                    this._pieParts[+('arc_' + _index).split('_')[1]].color = this._pieParts[+('arc_' + _index).split('_')[1]].hoverColor;
-                    this._pieParts[+('arc_' + _index).split('_')[1]].__draw();
-                    if (_prevId) {
-                        this._pieParts[+_prevId.split('_')[1]].color = this._pieParts[+_prevId.split('_')[1]].leaveColor;
-                        this._pieParts[+_prevId.split('_')[1]].__draw();
+    };
+
+    /***************Pie End******************/
+
+    /*************** Polar Chart **********/
+    function Polar () {
+        this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+        this._values         = [];
+        this._radius         = 150;
+        this._colors         = [];
+        this._angles         = {
+            begin:[],
+            end:[]
+        };
+        this._betweenAngles  = [];
+        this._countPolars    = -1;
+        this._totalValues    = 0;
+        this._labels         = [];
+        this._legendSize     = null;
+        this._cx             = this._radius;
+        this._cy             = this._radius;
+        _dataChart[_legendInfo.info2].map(_ => {
+            this._labels.push(_.text);
+            this._values.push(_.value);
+            this._totalValues += _.value
+        });
+        this._polarParts     = [];
+        this._labelsPosition = [];
+        this._prevId         = null;
+        this._prevColor      = null;
+    }
+    function SinglePolars (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor, value) {
+        this._movingX    = movingX;
+        this._movingY    = movingY;
+        this._color      = color;
+        this._leaveColor = color;
+        this._hoverColor = hoverColor;
+        this._startAngle = startAngle;
+        this._endAngle   = endAngle;
+        this._radius     = 0;
+        this._index      = index;
+        this._value      = value;
+    }
+    SinglePolars.prototype.__draw = function () {
+        self._canvas.fillStyle = this._color;
+        self._canvas.lineWidth = 1;
+        self._canvas.beginPath();
+        self._canvas.moveTo(this._movingX, this._movingY);
+        self._canvas.arc(this._movingX, this._movingY, this._radius, this._startAngle, this._endAngle, false);
+        self._canvas.lineTo(this._movingX, this._movingY);
+        self._canvas.fill();
+        self._canvas.strokeStyle = '#fff';
+        self._canvas.stroke();
+        self._canvas.beginPath();
+        self._canvas.save();
+        self._canvas.translate(this._movingX, this._movingY);
+        self._canvas.restore();
+    };
+    SinglePolars.prototype.__tooltip = function (x, y, widthText, widthValue, text, values, quadroFill) {
+        self._canvas.beginPath();
+        self._canvas.rect(x, y, Math.max(...[widthText, widthValue]), 30);
+        self._canvas.fillStyle = 'rgb(0,0,0)';
+        self._canvas.globalAlpha = .8
+        self._canvas.fill();
+        self._canvas.strokeStyle = '#fff';
+        self._canvas.fillStyle = '#fff';
+        self._canvas.fillText(self._result.__fittingString(self._canvas, text, Math.max(...[widthText, widthValue])), x + 20, y + 12);
+        self._canvas.fillText(self._result.__fittingString(self._canvas, values, widthValue), x + 20, y + 24);
+        self._canvas.clearColor;
+        self._canvas.stroke();
+        self._canvas.closePath();
+
+        self._canvas.beginPath();
+        self._canvas.lineWidth = 2;
+        self._canvas.rect(x + 5, y + 5, 10, 10);
+        self._canvas.fillStyle = quadroFill;
+        self._canvas.globalAlpha = 1;
+        self._canvas.fill();
+        self._canvas.closePath();
+    };
+    SinglePolars.prototype.__update = function (_constructor) {
+        const _maxPoint = (self._result.polar._radius * (_constructor._value * 100) / Math.max(...self._result.polar._values)) / 100;
+        const $interval = window.setInterval(() => {
+            if (this._radius + 2 >= _maxPoint) {
+                this._radius = _maxPoint;
+                this.__draw();
+                window.clearInterval($interval);
+            } else {
+                this._radius+=2;
+                this.__draw()
+            }
+        }, 10);
+    };
+    Polar.prototype.__polarAngles = function (count) {
+        this._angles.begin.push(count * (Math.PI * 2) / this._values.length);
+        this._angles.end.push((count * (Math.PI * 2) / this._values.length) + (Math.PI * 2) / this._values.length);
+    };
+    Polar.prototype.__animate = function () {
+        this._countPolars++;
+        this._polarParts[this._countPolars].__update(this._polarParts[this._countPolars]);
+    };
+    Polar.prototype.__initP = async function () {
+        this._polarParts = [];
+        this._betweenAngles = [];
+        this._labelsPosition = [];
+        this._colors = [];
+        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+        await setTimeout(() => {
+            this._labels.map(_j => this._colors.push(self._result.__getRandomColor()));
+            (() => {
+                if (self._legends_polar.display) {
+                    this.__generateLabelsAfterClearing(this, self._legends_position_polar);
+                } else {
+                    this._cx = self._widthCanvas / 2;
+                    this._cy = self._heightCanvas / 2;
+                }
+            })();
+            this._values.forEach((_value, index)=> {
+                // Becomes from Pie Prototype ~~~~
+                this.__polarAngles(index);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]]);
+                this._polarParts.push(new SinglePolars(
+                    this._cx, this._cy,
+                    this._angles.begin[index],
+                    this._angles.end[index],
+                    this._radius,
+                    this._colors[index % this._colors.length],
+                    index,
+                    self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/),
+                    _value
+                ));
+            });
+            const $syncInterval = setInterval(() => {
+                if (this._countPolars < this._polarParts.length - 1) {
+                    this.__animate();
+                } else {
+                    clearInterval($syncInterval);
+                    setTimeout(() => {
+                        this._polarParts.map(_class => {
+                            _class.__draw()
+                        })
+                    }, 500)
+                }
+            }, 200)
+        }, 0);
+        await canvas.addEventListener('mousemove', (event) => {
+            const diffX = event.pageX - this._cx;
+            const diffY = event.pageY - this._cy;
+            let angle = Math.atan2(diffY, diffX);
+            let _allowAreaForHover = false;
+            let realAngle = angle;
+            if (angle < 0) {
+                realAngle = (Math.PI - Math.abs(angle)) + Math.PI
+            }
+            if (self._legends_polar.display) {
+                for (let i = 0; i < this._labelsPosition.length; i++) {
+                    if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                        event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                    ) {
+                        _allowAreaForHover = true;
+                        canvas.style.cursor = 'pointer';
+                        this.__mouseEnterArea(realAngle, i, '_polarParts', this, 'polar', self._legends_position_polar);
                     }
                 }
-
-                const MesureText = (arr, _index) => {
-                    return self._canvas.measureText(arr[_index]).width > (2 * this._radius) - 40
-                    ? (2 * this._radius) - 40 : self._canvas.measureText(arr[_index]).width + 30;
-                }
-                //Rendering if tooltip is true
-                if (self._tooltip_pie) {
-                    let _angle = (this._betweenAngles[_index][0] + this._betweenAngles[_index][1]) / 2;
-                    self._canvas.font = '11px Arial';
-                    self._canvas.textAlign = 'left'
-                    const tooltipX = this._cx + Math.cos(_angle) * this._radius / 2 - MesureText(this._labels, _index) / 2;
-                    const tooltipY = this._cy + Math.sin(_angle) * this._radius / 2 - 10;
-                    self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
-                    this._pieParts.map(_class => {
-                        _class.__draw()
-                    });
-                    self._canvas.save();
-                    this._pieParts[+('arc_' + _index).split('_')[1]].__tooltip(
-                        tooltipX,
-                        tooltipY,
-                        MesureText(this._labels, _index),
-                        MesureText(this._values, _index),
-                        this._labels[_index],
-                        this._values[_index],
-                        _prevColor
-                    );
-                    self._canvas.restore();
-                }
-                //_____________
             }
-            _prevId = 'arc_' + _index;
-        }
-        const mouseLeaveArea = () => {
-            canvas.style.cursor = 'default'
-            if (_prevId) {
-                self._canvas.clearRect(0, self._heightCanvas / 2 + this._radius, self._widthCanvas, self._heightCanvas - self._heightCanvas / 2 + this._radius);
-                this._pieParts[+_prevId.split('_')[1]].color = _prevColor;
-                this._pieParts.map(_class => {
-                    _class.__draw()
-                });
+            if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
+                for (let _index = 0; _index < this._betweenAngles.length; _index++) {
+                    if (realAngle >= this._betweenAngles[_index][0] && realAngle <= this._betweenAngles[_index][1] &&
+                        this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                        _allowAreaForHover = true;
+                        canvas.style.cursor = 'pointer';
+                        this.__mouseEnterArea(realAngle, _index, '_polarParts', this, 'polar', self._legends_position_polar);
+                        break;
+                    } else if ((self._onHover_polar || this._prevId) &&
+                        !this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                        !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar);
+                    }
+                }
+            } else if (self._onHover_polar || this._prevId) {
+                !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar);
             }
-            _prevId = null
-        }
+        })
     };
-    /*********************************/
+    /****************Polar End ***********/
+
 
     /******************HELPERS***********/
     Result.prototype.__convertHex = function (hex,opacity){
@@ -4131,7 +4312,7 @@ function ChartArt (selector) {
                 value: true,
                 emptyProperty: true
             }].forEach(_ => self.constructor.__maxValue(_, options))
-        } else if (options.type === 'pie' || options.type === 'doughnut') {
+        } else if (options.type === 'pie' || options.type === 'polar') {
             [{
                 nesting: ['data', 'datasets', 'legends', 'display'],
                 value: true,
@@ -4149,10 +4330,6 @@ function ChartArt (selector) {
                 value: true,
                 emptyProperty: true
             }, {
-                nesting: ['options', 'centerSize'],
-                value: 100,
-                emptyProperty: 50
-            }, {
                 nesting: ['options', 'lineWidth'],
                 value: 3,
                 emptyProperty: 0.1
@@ -4165,6 +4342,7 @@ function ChartArt (selector) {
         selector.width                = self._widthCanvas;
         selector.height               = self._heightCanvas;
         self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
+
         // For Bar Chart ~~~~~~~~~
         self._bars                    = parameters.options.bars;
         self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
@@ -4193,15 +4371,24 @@ function ChartArt (selector) {
         self._legends_pie             = parameters.data.datasets.legends;
         self._legends_position_pie    = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
         //~~~~~~~~~~~~~~~~~~~~~~
+
+        // For Polar Chart ~~~~~~~~~~~~~~~~~
+        self._lineWidth_polar         = parameters.options.lineWidth || 0.1;
+        self._onHover_polar           = parameters.options.onHover && parameters.options.onHover.event;
+        self._tooltip_polar           = parameters.options.onHover && parameters.options.onHover.tooltip;
+        self._legends_polar           = parameters.data.datasets.legends;
+        self._legends_position_polar  = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
+        // ~~~~~~~~~~~~~~~~~~~~~
         self._result = new Result(selector, parameters);
 
         return self._result[parameters.type]
-    }
+    };
     return new Result(selector)
 }
-// For Pie Chart
+
+// For Polar Chart
 new ChartArt(canvas).__init({
-    type: 'pie',
+    type: 'polar',
     data: {
         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
         datasets: {
@@ -4221,6 +4408,29 @@ new ChartArt(canvas).__init({
         centerSize: 50
     }
 });
+
+
+// For Pie Chart
+// new ChartArt(canvas).__init({
+//     type: 'pie',
+//     data: {
+//         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+//         datasets: {
+//             legends: {
+//                 display: true,
+//                 position: 'bottom'
+//             },
+//             data: _dataChart[_legendInfo.info2],
+//         }
+//     },
+//     options: {
+//         lineWidth: 1,
+//         onHover: {
+//             event: true,
+//             tooltip: true
+//         }
+//     }
+// });
 // For Bar Chart
 // new ChartArt(canvas).__init({
 //     type: 'bar',
