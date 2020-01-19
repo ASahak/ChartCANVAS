@@ -46,9 +46,12 @@ function ChartArt (selector) {
             // this.bar.__init();
             // this.pie     = new Pie(options);
             // this.pie.__init();
-             this.polar   = new Polar(options);
-            Object.assign(this.polar.__proto__, Pie.prototype);
-            this.polar.__initP();
+            // this.polar   = new Polar(options);
+            // Object.assign(this.polar.__proto__, Pie.prototype);
+            // this.polar.__initP();
+
+            this.line       = new Line(options);
+            this.line.__initL();
         }
     }
 
@@ -427,14 +430,9 @@ function ChartArt (selector) {
         this.__setLegend(_legendInfo.info1);
         this.__drawBars(this.animateBars);
     };
-    Bar.prototype.__init = function () {
-        setTimeout(() => {
-            this.__animate()
-        }, 0)
-    };
     Bar.prototype.__update = function () {
         self.constructor.__maxValueInit(this._configuration);
-        this.__draw()
+        this.__draw();
     };
     Bar.prototype.__animate = function () {
         this.__update();
@@ -502,10 +500,15 @@ function ChartArt (selector) {
         }
         //______________________________________
     };
+    Bar.prototype.__init = function () {
+        setTimeout(() => {
+            this.__animate()
+        }, 0)
+    };
     // ***************Bar End*************
 
     /*******************Pie Chart**********************/
-    function Pie (options) {
+    function Pie () {
         this._gui            = new dat.GUI();
         this._values         = [];
         this._radius         = 150;
@@ -992,7 +995,7 @@ function ChartArt (selector) {
         this._prevId         = null;
         this._prevColor      = null;
 
-        const _polarFolder     = this._gui.addFolder('Polar');
+        const _polarFolder   = this._gui.addFolder('Polar');
         _polarFolder.add(self, '_lineWidth_polar', 0.1, 3).name('Space of Polars')
             .onChange(() => {
                 this._polarParts.map(_class => {
@@ -1231,6 +1234,207 @@ function ChartArt (selector) {
     };
     /****************Polar End ***********/
 
+    /*************** Line Chart **********/
+    function Line (options) {
+        this._gui             = new dat.GUI();
+        const lineFolder      = this._gui.addFolder('Line');
+        this._configuration   = options;
+        self._borderColorLine = [175, 160, 160];
+    };
+    Line.prototype.__setCoordinatesNet = function (_displayY) {
+        let [_maxValue] = [
+            self._result.__max_min_values(this._configuration.data.datasets.data).max,
+            1
+        ];
+        let maxCeil = Math.ceil(Number(_maxValue.toString().split('')[0] + (_maxValue.toString().split('')[1] | _maxValue.toString().split('')[1]))/10);
+        if (self._labelsYLine.display) {
+            if (_maxValue > 999999999999 || _maxValue === Infinity) {
+                maxCeil *= 10000;
+                _legendInfo.info1 = 'x10000000'
+            } else if (_maxValue > 999999999) {
+                maxCeil *= 1000;
+                _legendInfo.info1 = 'x1000000'
+            } else if (_maxValue > 99999999) {
+                maxCeil *= 100;
+                _legendInfo.info1 = 'x1000000'
+            } else if (_maxValue > 9999999) {
+                maxCeil *= 10;
+                _legendInfo.info1 = 'x1000000'
+            } else if (_maxValue > 999999) {
+                maxCeil *= 1;
+                _legendInfo.info1 = 'x1000000'
+            } else if (_maxValue > 99999) {
+                maxCeil *= 100;
+                _legendInfo.info1 = 'x1000'
+            } else if (_maxValue > 9999) {
+                maxCeil *= 10;
+                _legendInfo.info1 = 'x1000'
+            } else if (_maxValue > 999) {
+                maxCeil *= 1;
+                _legendInfo.info1 = 'x1000'
+            } else if (_maxValue > 99) {
+                maxCeil *= 100;
+                _legendInfo.info1 = 'x1'
+            } else if (_maxValue > 9) {
+                maxCeil *= 10;
+                _legendInfo.info1 = 'x1'
+            } else {
+                maxCeil *= 1;
+                _legendInfo.info1 = 'x1'
+            }
+        }
+        let nextVal = maxCeil;
+        for (let i = 1; i < 10; i++) {
+            self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
+            self._canvas.beginPath();
+            self._canvas.moveTo(self._paddingYLeftLine - 5, i * (self._heightCanvas - self._paddingXBottomLine - self._paddingXTopLine) / 10 + self._paddingXTopLine)
+            self._canvas.lineTo(self._widthCanvas - self._paddingYRightLine, i * (self._heightCanvas - self._paddingXBottomLine - self._paddingXTopLine) / 10 + self._paddingXTopLine)
+            self._canvas.lineWidth = self._lineXWidthLine;
+            if (self._borderColorLine instanceof Array) {
+                self._canvas.strokeStyle = `rgba(${self._borderColorLine[0]}, ${self._borderColorLine[1]}, ${self._borderColorLine[2]}, ${self._borderOpacityLine})`
+            } else {
+                self._canvas.strokeStyle = self._borderColorLine
+            }
+            self._canvas.stroke();
+            self._canvas.resetTransform();
+            self._canvas.closePath();
+            if (_displayY) {
+                nextVal -= maxCeil/10;
+                self._canvas.font = self._labelsYLine.fontSize + 'px Arial';
+                self._canvas.textAlign = "right";
+                self._canvas.fillStyle = self._labelsYLine.color;
+                self._canvas.fillText((nextVal.toFixed(1).replace(/\.0+$/,'')).toString(), self._paddingYLeftLine - 7, i * (self._heightCanvas - self._paddingXBottomLine - self._paddingXTopLine) / 10 + self._paddingXTopLine + self._labelsYLine.fontSize / 3)
+                self._canvas.clearColor;
+            }
+        }
+        for (let i = 1; i < this._configuration.data.labels.length; i++) {
+            self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
+            self._canvas.beginPath();
+            self._canvas.moveTo(self._paddingYLeftLine + i * (self._widthCanvas - self._paddingYRightLine - self._paddingYLeftLine) / this._configuration.data.labels.length, self._paddingXTopLine)
+            self._canvas.lineTo(self._paddingYLeftLine + i * (self._widthCanvas - self._paddingYRightLine - self._paddingYLeftLine) / this._configuration.data.labels.length, self._heightCanvas - self._paddingXBottomLine)
+            self._canvas.lineWidth = self._lineXWidthLine;
+            if (self._borderColorLine instanceof Array) {
+                self._canvas.strokeStyle = `rgba(${self._borderColorLine[0]}, ${self._borderColorLine[1]}, ${self._borderColorLine[2]}, ${self._borderOpacityLine})`
+            } else {
+                self._canvas.strokeStyle = self._borderColorLine
+            }
+            self._canvas.stroke();
+            self._canvas.resetTransform();
+            self._canvas.closePath();
+        }
+    };
+    Line.prototype.__setAxisYLine = function (_displayX) {
+        self._canvas.beginPath();
+        self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
+        let _heightAxis = null;
+        if (self._labelsXLine.hasOwnProperty('fontSize') && _displayX) {
+            _heightAxis = self._labelsXLine.fontSize * 2;
+            self._paddingXBottomLine = _heightAxis
+        } else _heightAxis = self._paddingXBottomLine;
+        self._lineXWidthLine && (
+            self._canvas.moveTo(self._paddingYLeftLine, self._heightCanvas - _heightAxis),
+                self._canvas.lineTo(self._paddingYLeftLine, self._paddingXTopLine),
+                self._canvas.lineWidth = self._lineYWidthLine
+        );
+        if (self._axisOpacityLine !== 1) {
+            self._canvas.strokeStyle = self._axisColorLine.replace(')', ', ' + self._axisOpacityLine + ')').replace('rgb', 'rgba')
+        } else {
+            self._canvas.strokeStyle = self._axisColorLine
+        }
+        self._canvas.stroke();
+        self._canvas.closePath();
+        self._canvas.resetTransform()
+    };
+    Line.prototype.__setAxisXLine = function (_display) {
+        self._canvas.beginPath();
+        self._canvas.setTransform(1, 0, 0, 1, 0.5, 0.5);
+        self._paddingXBottomLine = self._labelsXLine.display ? self._paddingXBottomLine: 10;
+        let _heightAxis = null;
+        if (self._labelsXLine.hasOwnProperty('fontSize') && _display) {
+            _heightAxis = self._labelsXLine.fontSize * 2;
+            self._paddingXBottomLine = _heightAxis
+        } else _heightAxis = self._paddingXBottomLine;
+        self._lineXWidthLine && (
+            self._canvas.moveTo(self._paddingYLeftLine, self._heightCanvas - _heightAxis),
+                self._canvas.lineTo(self._widthCanvas - self._paddingYRightLine, self._heightCanvas - _heightAxis),
+                self._canvas.lineWidth = self._lineYWidthLine
+        );
+        if (self._axisOpacityLine !== 1) {
+            self._canvas.strokeStyle = self._axisColorLine.replace(')', ', ' + self._axisOpacityLine + ')').replace('rgb', 'rgba')
+        } else {
+            self._canvas.strokeStyle = self._axisColorLine
+        }
+        self._canvas.stroke();
+        self._canvas.closePath();
+        self._canvas.resetTransform()
+    };
+    Line.prototype.__beforeChanging = function () {
+        if (self._legendLine) {
+            self._paddingXTopLine = 30
+        } else {
+            self._paddingXTopLine = 10
+        }
+
+        let [_maxValue] = [
+            self._result.__max_min_values(this._configuration.data.datasets.data).max
+        ];
+        // For Getting current Left Padding
+        if (self._labelsYLine.display) {
+            self._canvas.font = self._labelsYLine.fontSize + 'px Arial';
+            if (_maxValue.toString().split('').length > 9) {
+                self._paddingYLeftLine = self._canvas.measureText('0000').width + 10
+            } else {
+                self._paddingYLeftLine = self._canvas.measureText('000').width + 10
+            }
+        } else {
+            self._paddingYLeftLine = 10
+        }
+        //_____________________
+    };
+    Line.prototype.__setAxisX = function (_display) {
+        this.__setAxisXLine(_display);
+        if (_display) {
+            self._canvas.font = self._labelsXLine.fontSize + 'px Arial';
+            let _heightAxis = null;
+            if (self._labelsXLine.hasOwnProperty('fontSize')) {
+                _heightAxis = self._labelsXLine.fontSize * 2;
+                self._paddingXBottomLine = _heightAxis
+            } else _heightAxis = self._paddingXBottomLine
+            let _canvasBadgeWidth = (self._widthCanvas - (self._paddingYLeftLine + self._paddingYRightLine)) / this._configuration.data.labels.length;
+            this._configuration.data.labels.forEach((_, index) => {
+                self._canvas.textAlign = "center";
+                self._canvas.fillStyle = self._labelsXLine.color;
+                self._canvas.fillText(self._result.__fittingString(self._canvas, _, _canvasBadgeWidth - 10), (index * _canvasBadgeWidth + self._paddingYLeftLine) + (_canvasBadgeWidth/2), self._heightCanvas - ((_heightAxis - _heightAxis / 3) / 2))
+                self._canvas.clearColor;
+            })
+        }
+    };
+    Line.prototype.__setAxisY = function (_displayX, _displayY) {
+        this.__setAxisYLine(_displayX);
+        if (_displayY) {
+            self._canvas.font = self._labelsYLine.fontSize + 'px Arial';
+            self._canvas.textAlign = "right";
+            self._canvas.fillStyle = self._labelsYLine.color;
+            self._canvas.fillText('0', self._paddingYLeftLine - 7, self._heightCanvas - self._paddingXBottomLine);
+            self._canvas.clearColor;
+        }
+    };
+    Line.prototype.__draw = function () {
+        this.__beforeChanging();
+        this.__setAxisX(self._labelsXLine.display);
+        this.__setAxisY(self._labelsXLine.display, self._labelsYLine.display);
+        this.__setCoordinatesNet(self._labelsYLine.display);
+    };
+    Line.prototype.__update = function () {
+        self.constructor.__maxValueInit(this._configuration);
+        this.__draw()
+    };
+    Line.prototype.__initL = async function () {
+        setTimeout(() => {
+            this.__update()
+        })
+    };
+    /***************Line Chart End *******/
 
     /******************HELPERS***********/
     this.constructor.__valuesIntegration = function(_values) {
@@ -1325,7 +1529,7 @@ function ChartArt (selector) {
 
     this.constructor.__maxValueInit = function (options) {
         self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
-        if (options.type === 'bar') {
+        if (options.type === 'bar' || options.type === 'line') {
             [{
                 nesting: ['options', 'scales', 'axisColor'],
                 value: 'rgb(85,72,72)',
@@ -1447,6 +1651,25 @@ function ChartArt (selector) {
         self._legends_polar           = parameters.data.datasets.legends;
         self._legends_position_polar  = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
         // ~~~~~~~~~~~~~~~~~~~~~
+
+        // For Line Chart ~~~~~~~~~~~~~~~~~~~~~~~
+        self._pointTooltip            = (parameters.options.points && parameters.options.points.mouseMove && parameters.options.points.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.points.mouseMove.tooltip : true;
+        self._legendLine              = parameters.options.legend;
+        self._paddingYLeftLine        = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
+        self._paddingXBottomLine      = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
+        self._paddingYRightLine       = parameters.options.padding && parameters.options.padding.paddingRight || 10;
+        self._paddingXTopLine         = parameters.options.padding && parameters.options.padding.paddingTop || 10;
+        self._lineYWidthLine          = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
+        self._lineXWidthLine          = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
+        self._borderColorLIne         = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || '#000';
+        self._axisColorLine           = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
+        self._axisOpacityLine         = 1;
+        self._borderOpacityLine       = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
+        self._labelsXLine             = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
+        self._labelsYLine             = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
+        self._paddingXBottomLine      = self._labelsXLine.display ? self._paddingXBottomLine: 10;
+        self._paddingYLeftLine        = self._labelsYLine.display ? self._paddingYLeftLine + (50 - self._paddingYLeftLine): 10;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         self._result = new Result(selector, parameters);
 
         return self._result[parameters.type]
@@ -1454,28 +1677,76 @@ function ChartArt (selector) {
     return new Result(selector)
 }
 
-// For Polar Chart
+// For Line Chart
 new ChartArt(canvas).__init({
-    type: 'polar',
+    type: 'line',
     data: {
         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
         datasets: {
-            legends: {
-                display: true,
-                position: 'bottom'
-            },
-            data: _dataChart[_legendInfo.info2],
+            data: _dataChart[_legendInfo.info2]
         }
     },
     options: {
-        axisColor: '#ccc',
-        lineWidth: 1,
-        onHover: {
-            event: true,
-            tooltip: true
+        legend: true,
+        points: {
+            mouseMove: {
+                tooltip: true,
+                set callback (element) {}
+            },
+        },
+        padding: {
+            paddingLeft: 70,
+            paddingRight: 30,
+            paddingBottom: 10
+        },
+        scales: {
+            axisColor: 'rgb(85,72,72)',
+            yAxis: {
+                lineWidth: 1,
+                tricks: {
+                    labels: {
+                        display: true,
+                        fontSize: 14,
+                        color: 'rgb(35,32,32)'
+                    }
+                }
+            },
+            xAxis: {
+                lineWidth: 1,
+                tricks: {
+                    labels: {
+                        display: true,
+                        fontSize: 14,
+                        color: 'rgb(35,32,32)'
+                    }
+                }
+            }
         }
     }
 });
+
+// For Polar Chart
+// new ChartArt(canvas).__init({
+//     type: 'polar',
+//     data: {
+//         labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+//         datasets: {
+//             legends: {
+//                 display: true,
+//                 position: 'bottom'
+//             },
+//             data: _dataChart[_legendInfo.info2],
+//         }
+//     },
+//     options: {
+//         axisColor: '#ccc',
+//         lineWidth: 1,
+//         onHover: {
+//             event: true,
+//             tooltip: true
+//         }
+//     }
+// });
 
 
 // For Pie Chart
@@ -1499,6 +1770,7 @@ new ChartArt(canvas).__init({
 //         }
 //     }
 // });
+
 // For Bar Chart
 // new ChartArt(canvas).__init({
 //     type: 'bar',
