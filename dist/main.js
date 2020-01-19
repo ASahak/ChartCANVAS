@@ -3051,8 +3051,8 @@ const canvas = document.querySelector('#chart');
 const _dataChart = {
     2009: [
         { value: 704000000, text: 'Africa'},
-        { value: 506000000, text: 'North America'},
-        { value: 338000000, text: 'South America'},
+        { value: 506000000, text: 'N. America'},
+        { value: 338000000, text: 'S. America'},
         { value: 0, text: 'Antarctica'},
         { value: 3150000000, text: 'Asia'},
         { value: 696000000, text: 'Europa'},
@@ -3060,8 +3060,8 @@ const _dataChart = {
     ],
     2014: [
         { value: 780000000, text: 'Africa'},
-        { value: 560000000, text: 'North America'},
-        { value: 350000000, text: 'South America'},
+        { value: 560000000, text: 'N. America'},
+        { value: 350000000, text: 'S. America'},
         { value: 0, text: 'Antarctica'},
         { value: 3600000000, text: 'Asia'},
         { value: 727000000, text: 'Europa'},
@@ -3069,8 +3069,8 @@ const _dataChart = {
     ],
     2019: [
         { value: 788000000, text: 'Africa'},
-        { value: 578000000, text: 'North America'},
-        { value: 398000000, text: 'South America'},
+        { value: 578000000, text: 'N. America'},
+        { value: 398000000, text: 'S. America'},
         { value: 0, text: 'Antarctica'},
         { value: 3780000000, text: 'Asia'},
         { value: 769000000, text: 'Europa'},
@@ -3110,19 +3110,19 @@ function ChartArt (selector) {
         barFolder.addColor(self, '_borderColor').name('Border Color')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
-        })
+        });
         barFolder.add(self, '_borderOpacity', 0, 1).name('Border Opacity')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
-        })
+        });
         barFolder.addColor(self, '_axisColor').name('Axis Color')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
-            })
+            });
         barFolder.add(self, '_axisOpacity', 0, 1).name('Axis Opacity')
             .onChange(() => {
                 requestAnimationFrame(this.__animate.bind(this))
-            })
+            });
         const _bars = barFolder.addFolder('Bars');
         _bars.add(self._bars, 'width', 20, 60).name('Width')
             .onChange(() => {
@@ -3572,6 +3572,7 @@ function ChartArt (selector) {
             this._values.push(_.value);
             this._totalValues += _.value
         });
+        [this._divider, this._dividerText] = self.constructor.__valuesIntegration(this._values);
         this._pieParts       = [];
         this._labelsPosition = [];
         this._prevId         = null;
@@ -3586,6 +3587,7 @@ function ChartArt (selector) {
         const _legends = _pieFolder.addFolder('Legends');
         _legends.add(self._legends_pie, 'display').name('Display')
             .onChange((e) => {
+                _legendsPosition.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
                 this.__init()
             });
         let fakePosition = {
@@ -3723,7 +3725,6 @@ function ChartArt (selector) {
         this._hoverColor    = hoverColor;
     }
     SinglePies.prototype.__update = function () {
-        console.log(this._everyAngle, this._endAngle)
         const $interval = window.setInterval(() => {
             if (this._limitAngle >= this._endAngle) {
                 window.clearInterval($interval);
@@ -3735,21 +3736,20 @@ function ChartArt (selector) {
     };
     SinglePies.prototype.__tooltip = function (x, y, widthText, widthValue, text, values, quadroFill) {
         self._canvas.beginPath();
-        self._canvas.rect(x, y, Math.max(...[widthText, widthValue]), 30);
+        self._canvas.rect(x, y, widthText + widthValue, 18);
         self._canvas.fillStyle = 'rgb(0,0,0)';
         self._canvas.globalAlpha = .8
         self._canvas.fill();
         self._canvas.strokeStyle = '#fff';
         self._canvas.fillStyle = '#fff';
-        self._canvas.fillText(self._result.__fittingString(self._canvas, text, Math.max(...[widthText, widthValue])), x + 20, y + 12);
-        self._canvas.fillText(self._result.__fittingString(self._canvas, values, widthValue), x + 20, y + 24);
+        self._canvas.fillText(self._result.__fittingString(self._canvas, text + ' ' + values, widthText + widthValue), x + 20, y + 12);
         self._canvas.clearColor;
         self._canvas.stroke();
         self._canvas.closePath();
 
         self._canvas.beginPath();
         self._canvas.lineWidth = 2;
-        self._canvas.rect(x + 5, y + 5, 10, 10);
+        self._canvas.rect(x + 5, y + 4, 10, 10);
         self._canvas.fillStyle = quadroFill;
         self._canvas.globalAlpha = 1;
         self._canvas.fill();
@@ -3757,7 +3757,7 @@ function ChartArt (selector) {
     };
     SinglePies.prototype.__draw = function () {
         self._canvas.fillStyle = this._color;
-        self._canvas.lineWidth = 1;
+        self._canvas.lineWidth = self._lineWidth_pie;
 
         self._canvas.moveTo(this._x, this._y);
         self._canvas.arc(this._x, this._y, this._radius / 2, this._startAngle, this._limitAngle, false);
@@ -3779,7 +3779,7 @@ function ChartArt (selector) {
         const distSq = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
         return distSq <= radius;
     };
-    Pie.prototype.__mouseEnterArea = function (realAngle, _index, _hint, _constructor, type, _condition) {
+    Pie.prototype.__mouseEnterArea = function (realAngle, _index, _hint, _constructor, type, _condition, _legendsDisplay) {
         if (_constructor._prevId !== 'arc_' + _index) {
             _constructor._prevColor = _constructor[_hint][+('arc_' + _index).split('_')[1]]._color;
             if (self['_onHover_' + type]) {
@@ -3791,18 +3791,31 @@ function ChartArt (selector) {
                 }
             }
 
-            const MesureText = (arr, _index) => {
-                return self._canvas.measureText(arr[_index]).width > (2 * _constructor._radius) - 40
-                    ? (2 * _constructor._radius) - 40 : self._canvas.measureText(arr[_index]).width + 30;
+            const MesureText = (arr, _index, type) => {
+                if (type === 'integer') {
+                    let text = _constructor._divider ? Math.round(arr[_index] / _constructor._divider) + ' ' + _constructor._dividerText : arr[_index];
+                    return {
+                        text: text,
+                        width : self._canvas.measureText(text).width > (2 * _constructor._radius) - 40
+                        ? (2 * _constructor._radius) - 40 : self._canvas.measureText(text).width
+                    }
+                } else {
+                    return {
+                        text: arr[_index],
+                        width: self._canvas.measureText(arr[_index]).width > (2 * _constructor._radius) - 40
+                            ? (2 * _constructor._radius) - 40 : self._canvas.measureText(arr[_index]).width + 30
+                    }
+                }
             };
             //Rendering if tooltip is true
             if (self['_tooltip_' + type]) {
                 let _angle = (_constructor._betweenAngles[_index][0] + _constructor._betweenAngles[_index][1]) / 2;
                 self._canvas.font = '11px Arial';
                 self._canvas.textAlign = 'left';
-                const tooltipX = _constructor._cx + Math.cos(_angle) * _constructor[_hint][_index]._radius / 2 - MesureText(_constructor._labels, _index) / 2;
+                const tooltipX = _constructor._cx + Math.cos(_angle) * _constructor[_hint][_index]._radius / 2 - MesureText(_constructor._labels, _index, 'string').width / 2;
                 const tooltipY = _constructor._cy + Math.sin(_angle) * _constructor[_hint][_index]._radius / 2 - 10;
                 self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+                type === 'polar' && _constructor.__drawNet();
                 _constructor[_hint].map(_class => {
                     _class.__draw()
                 });
@@ -3810,28 +3823,29 @@ function ChartArt (selector) {
                 _constructor[_hint][+('arc_' + _index).split('_')[1]].__tooltip(
                     tooltipX,
                     tooltipY,
-                    MesureText(_constructor._labels, _index),
-                    MesureText(_constructor._values, _index),
-                    _constructor._labels[_index],
-                    _constructor._values[_index],
+                    MesureText(_constructor._labels, _index, 'string').width,
+                    MesureText(_constructor._values, _index, 'integer').width,
+                    MesureText(_constructor._labels, _index, 'string').text,
+                    MesureText(_constructor._values, _index, 'integer').text,
                     _constructor._prevColor
                 );
                 self._canvas.restore();
-                this.__generateLabelsAfterClearing(this, _condition);
+                _legendsDisplay.display && this.__generateLabelsAfterClearing(this, _condition);
             }
             //_____________
         }
         _constructor._prevId = 'arc_' + _index;
     };
-    Pie.prototype.__mouseLeaveArea = function (_constructor, _hint, _condition) {
+    Pie.prototype.__mouseLeaveArea = function (_constructor, _hint, _condition, type, _legendsDisplay) {
         canvas.style.cursor = 'default';
         if (_constructor._prevId) {
             self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+            type === 'polar' && _constructor.__drawNet();
             _constructor[_hint][+_constructor._prevId.split('_')[1]]._color = _constructor._prevColor;
             _constructor[_hint].map(_class => {
                 _class.__draw()
             });
-            this.__generateLabelsAfterClearing(this, _condition);
+            _legendsDisplay.display && this.__generateLabelsAfterClearing(this, _condition);
         }
         _constructor._prevId = null
     };
@@ -3896,6 +3910,7 @@ function ChartArt (selector) {
         this._cy = _topCY + this._radius;
     };
     Pie.prototype.__drawLegendsByPositionHorizontal = function (_constructor, position) {
+        _constructor._labelsPosition = [];
         _constructor._cy = self._heightCanvas / 2;
         self._canvas.font = _constructor._legendSize + 'px Arial';
         let _mainLabelsHeight = 0;
@@ -3976,7 +3991,7 @@ function ChartArt (selector) {
                     ) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        this.__mouseEnterArea(realAngle, i, '_pieParts', this, 'pie', self._legends_position_pie);
+                        this.__mouseEnterArea(realAngle, i, '_pieParts', this, 'pie', self._legends_position_pie, self._legends_pie);
                     }
                 }
             }
@@ -3985,11 +4000,11 @@ function ChartArt (selector) {
                     if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        this.__mouseEnterArea(realAngle, _index, '_pieParts', this, 'pie', self._legends_position_pie);
+                        this.__mouseEnterArea(realAngle, _index, '_pieParts', this, 'pie', self._legends_position_pie, self._legends_pie);
                     }
                 })
             } else if (self._onHover_pie || this._prevId) {
-                !_allowAreaForHover && this.__mouseLeaveArea(this, '_pieParts', self._legends_position_pie);
+                !_allowAreaForHover && this.__mouseLeaveArea(this, '_pieParts', self._legends_position_pie, 'pie', self._legends_pie);
             }
         });
     };
@@ -4018,10 +4033,84 @@ function ChartArt (selector) {
             this._values.push(_.value);
             this._totalValues += _.value
         });
+        [this._divider, this._dividerText] = self.constructor.__valuesIntegration(this._values);
         this._polarParts     = [];
         this._labelsPosition = [];
         this._prevId         = null;
         this._prevColor      = null;
+
+        const _polarFolder     = this._gui.addFolder('Polar');
+        _polarFolder.add(self, '_lineWidth_polar', 0.1, 3).name('Space of Polars')
+            .onChange(() => {
+                this._polarParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        const _legends = _polarFolder.addFolder('Legends');
+        _legends.add(self._legends_polar, 'display').name('Display')
+            .onChange((e) => {
+                _legendsPosition.domElement.parentElement.setAttribute('style', `pointer-events: ${e ? 'auto' : 'none'}; opacity: ${e ? 1 : 0.5}`)
+                this.__initP()
+            });
+        let fakePosition = {
+            top: false,
+            left: false,
+            bottom: false,
+            right: false,
+        };
+        fakePosition[self._legends_position_polar] = true;
+        const _legendsPosition = _legends.addFolder('Position');
+        _legendsPosition.add(fakePosition, 'top').name('Top').listen()
+            .onChange((e) => {
+                setChecked("top");
+                if (e) {
+                    self._legends_position_polar = 'top';
+                    this.__initP()
+                }
+            });
+        _legendsPosition.add(fakePosition, 'left').name('Left').listen()
+            .onChange((e) => {
+                setChecked("left");
+                if (e) {
+                    self._legends_position_polar = 'left';
+                    this.__initP()
+                }
+            });
+        _legendsPosition.add(fakePosition, 'bottom').name('Bottom').listen()
+            .onChange((e) => {
+                setChecked("bottom");
+                if (e) {
+                    self._legends_position_polar = 'bottom';
+                    this.__initP()
+                }
+            });
+        _legendsPosition.add(fakePosition, 'right').name('Right').listen()
+            .onChange((e) => {
+                setChecked("right");
+                if (e) {
+                    self._legends_position_polar = 'right';
+                    this.__initP()
+                }
+            });
+        function setChecked( prop ){
+            for (let param in fakePosition){
+                fakePosition[param] = false;
+            }
+            fakePosition[prop] = true;
+        }
+        _polarFolder.add(self, '_onHover_polar').name('Hover Polar')
+            .onChange(() => {
+                this._polarParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        _polarFolder.add(self, '_tooltip_polar').name('Hover Tooltip')
+            .onChange(() => {
+                this._polarParts.map(_class => {
+                    _class.__draw()
+                })
+            });
+        _polarFolder.open();
     }
     function SinglePolars (movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor, value) {
         this._movingX    = movingX;
@@ -4037,7 +4126,7 @@ function ChartArt (selector) {
     }
     SinglePolars.prototype.__draw = function () {
         self._canvas.fillStyle = this._color;
-        self._canvas.lineWidth = 1;
+        self._canvas.lineWidth = self._lineWidth_polar;
         self._canvas.beginPath();
         self._canvas.moveTo(this._movingX, this._movingY);
         self._canvas.arc(this._movingX, this._movingY, this._radius, this._startAngle, this._endAngle, false);
@@ -4052,21 +4141,20 @@ function ChartArt (selector) {
     };
     SinglePolars.prototype.__tooltip = function (x, y, widthText, widthValue, text, values, quadroFill) {
         self._canvas.beginPath();
-        self._canvas.rect(x, y, Math.max(...[widthText, widthValue]), 30);
+        self._canvas.rect(x, y, widthText +  widthValue, 18);
         self._canvas.fillStyle = 'rgb(0,0,0)';
         self._canvas.globalAlpha = .8
         self._canvas.fill();
         self._canvas.strokeStyle = '#fff';
         self._canvas.fillStyle = '#fff';
-        self._canvas.fillText(self._result.__fittingString(self._canvas, text, Math.max(...[widthText, widthValue])), x + 20, y + 12);
-        self._canvas.fillText(self._result.__fittingString(self._canvas, values, widthValue), x + 20, y + 24);
+        self._canvas.fillText(self._result.__fittingString(self._canvas, text + ' ' + values, widthText + widthValue), x + 20, y + 12);
         self._canvas.clearColor;
         self._canvas.stroke();
         self._canvas.closePath();
 
         self._canvas.beginPath();
         self._canvas.lineWidth = 2;
-        self._canvas.rect(x + 5, y + 5, 10, 10);
+        self._canvas.rect(x + 5, y + 4, 10, 10);
         self._canvas.fillStyle = quadroFill;
         self._canvas.globalAlpha = 1;
         self._canvas.fill();
@@ -4093,11 +4181,22 @@ function ChartArt (selector) {
         this._countPolars++;
         this._polarParts[this._countPolars].__update(this._polarParts[this._countPolars]);
     };
+    Polar.prototype.__drawNet = function () {
+        for (let i = 0; i < 8; i++) {
+            self._canvas.lineWidth = 1;
+            self._canvas.beginPath();
+            self._canvas.arc(this._cx, this._cy, this._radius - (i * (this._radius / 7)), 0, 2 * Math.PI, false);
+            self._canvas.strokeStyle = self._colorAxis_polar;
+            self._canvas.stroke();
+            self._canvas.beginPath();
+        }
+    };
     Polar.prototype.__initP = async function () {
         this._polarParts = [];
         this._betweenAngles = [];
         this._labelsPosition = [];
         this._colors = [];
+        this._countPolars = -1;
         self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
         await setTimeout(() => {
             this._labels.map(_j => this._colors.push(self._result.__getRandomColor()));
@@ -4109,6 +4208,7 @@ function ChartArt (selector) {
                     this._cy = self._heightCanvas / 2;
                 }
             })();
+            this.__drawNet();
             this._values.forEach((_value, index)=> {
                 // Becomes from Pie Prototype ~~~~
                 this.__polarAngles(index);
@@ -4154,7 +4254,7 @@ function ChartArt (selector) {
                     ) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        this.__mouseEnterArea(realAngle, i, '_polarParts', this, 'polar', self._legends_position_polar);
+                        this.__mouseEnterArea(realAngle, i, '_polarParts', this, 'polar', self._legends_position_polar, self._legends_polar);
                     }
                 }
             }
@@ -4164,15 +4264,15 @@ function ChartArt (selector) {
                         this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
                         _allowAreaForHover = true;
                         canvas.style.cursor = 'pointer';
-                        this.__mouseEnterArea(realAngle, _index, '_polarParts', this, 'polar', self._legends_position_polar);
+                        this.__mouseEnterArea(realAngle, _index, '_polarParts', this, 'polar', self._legends_position_polar, self._legends_polar);
                         break;
                     } else if ((self._onHover_polar || this._prevId) &&
                         !this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
-                        !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar);
+                        !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar, 'polar', self._legends_polar);
                     }
                 }
             } else if (self._onHover_polar || this._prevId) {
-                !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar);
+                !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', self._legends_position_polar, 'polar', self._legends_polar);
             }
         })
     };
@@ -4180,6 +4280,16 @@ function ChartArt (selector) {
 
 
     /******************HELPERS***********/
+    this.constructor.__valuesIntegration = function(_values) {
+        const [min, max] = [Math.min(..._values), Math.max(..._values)];
+        if (max > 1000000) {
+            return [1000000, 'M'];
+        } else if (max > 10000 && max < 1000000) {
+            return [1000, 'K'];
+        } else {
+            return [null, null]
+        }
+    };
     Result.prototype.__convertHex = function (hex,opacity){
         let hexCode = hex.replace('#',''),
         r = parseInt(hexCode.substring(0,2), 16),
@@ -4333,6 +4443,10 @@ function ChartArt (selector) {
                 nesting: ['options', 'lineWidth'],
                 value: 3,
                 emptyProperty: 0.1
+            }, {
+                nesting: ['options', 'axisColor'],
+                value: '#ccc',
+                emptyProperty: '#ccc'
             }].forEach(_ => self.constructor.__maxValue(_, options))
         }
     }
@@ -4373,6 +4487,7 @@ function ChartArt (selector) {
         //~~~~~~~~~~~~~~~~~~~~~~
 
         // For Polar Chart ~~~~~~~~~~~~~~~~~
+        self._colorAxis_polar         = parameters.options.axisColor || '#ccc';
         self._lineWidth_polar         = parameters.options.lineWidth || 0.1;
         self._onHover_polar           = parameters.options.onHover && parameters.options.onHover.event;
         self._tooltip_polar           = parameters.options.onHover && parameters.options.onHover.tooltip;
@@ -4400,12 +4515,12 @@ new ChartArt(canvas).__init({
         }
     },
     options: {
+        axisColor: '#ccc',
         lineWidth: 1,
         onHover: {
             event: true,
             tooltip: true
-        },
-        centerSize: 50
+        }
     }
 });
 
