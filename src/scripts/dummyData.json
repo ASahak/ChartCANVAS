@@ -1,0 +1,32 @@
+{
+  "header": "Predicted world population ",
+  "data": {
+    "2009": [
+      { "value": 704000000, "text": "Africa"},
+      { "value": 506000000, "text": "N. America"},
+      { "value": 338000000, "text": "S. America"},
+      { "value": 0, "text": "Antarctica"},
+      { "value": 3150000000, "text": "Asia"},
+      { "value": 696000000, "text": "Europa"},
+      { "value": 17000000, "text": "Australia"}
+    ],
+    "2014": [
+      { "value": 780000000, "text": "Africa"},
+      { "value": 560000000, "text": "N. America"},
+      { "value": 350000000, "text": "S. America"},
+      { "value": 0, "text": "Antarctica"},
+      { "value": 3600000000, "text": "Asia"},
+      { "value": 727000000, "text": "Europa"},
+      { "value": 20000000, "text": "Australia"}
+    ],
+    "2019": [
+      { "value": 788000000, "text": "Africa"},
+      { "value": 578000000, "text": "N. America"},
+      { "value": 398000000, "text": "S. America"},
+      { "value": 0, "text": "Antarctica"},
+      { "value": 3780000000, "text": "Asia"},
+      { "value": 769000000, "text": "Europa"},
+      { "value": 27000000, "text": "Australia"}
+    ]
+  }
+}
