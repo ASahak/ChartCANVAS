@@ -1,0 +1,1 @@
+export const tabCharts = ['Line', 'Bar', 'Pie', 'Polar'];

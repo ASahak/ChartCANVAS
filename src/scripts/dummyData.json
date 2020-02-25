@@ -1,0 +1,85 @@
+{
+  "line": {
+    "header": "List of continents by population in ",
+    "data": {
+      "1950": [
+        { "value": 228902000, "text": "Africa"},
+        { "value": 226719000, "text": "N. America"},
+        { "value": 113739000, "text": "S. America"},
+        { "value": 0, "text": "Antarctica"},
+        { "value": 1394018000, "text": "Asia"},
+        { "value": 549089000, "text": "Europa"},
+        { "value": 12682000, "text": "Australia"}
+      ],
+      "1990": [
+        { "value": 631614000, "text": "Africa"},
+        { "value": 429653000, "text": "N. America"},
+        { "value": 297869000, "text": "S. America"},
+        { "value": 0, "text": "Antarctica"},
+        { "value": 3202475000, "text": "Asia"},
+        { "value": 721086000, "text": "Europa"},
+        { "value": 26971000, "text": "Australia"}
+      ],
+      "2010": [
+        { "value": 546867000, "text": "Africa"},
+        { "value": 578000000, "text": "N. America"},
+        { "value": 397085000, "text": "S. America"},
+        { "value": 0, "text": "Antarctica"},
+        { "value": 4169850000, "text": "Asia"},
+        { "value": 735395000, "text": "Europa"},
+        { "value": 36411000, "text": "Australia"}
+      ],
+      "2020": [
+        { "value": 1275920972, "text": "Africa"},
+        { "value": 582931600, "text": "N. America"},
+        { "value": 423581078, "text": "S. America"},
+        { "value": 0, "text": "Antarctica"},
+        { "value": 4560667108, "text": "Asia"},
+        { "value": 746419440, "text": "Europa"},
+        { "value": 39901000, "text": "Australia"}
+      ]
+    }
+  },
+  "bar": {
+    "header": "List of highest mountains on Earth (m)",
+    "data": [
+      {"value": 8848, "text": "Everest"},
+      {"value": 8516, "text": "Lhotse"},
+      {"value": 8091, "text": "Anapurna"},
+      {"value": 8167, "text": "Dhaulagiri"},
+      {"value": 8188, "text": "Cho Oyu"},
+      {"value": 8611, "text": "Chogori"},
+      {"value": 8126, "text": "Nanga Parbat"},
+      {"value": 8611, "text": "Chogori"},
+      {"value": 8163, "text": "Manaslu"},
+      {"value": 8485, "text": "Makalu"}
+    ]
+  },
+  "pie": {
+    "header": "Mountains of Armenia (m)",
+    "data": [
+       {"value": 4090, "text": "Aragats"},
+       {"value": 3906, "text": "Kaputjugh"},
+       {"value": 3598, "text": "Azhdahak"},
+       {"value": 3594, "text": "Tsxruk"},
+       {"value": 3560, "text": "Spitakasar"},
+       {"value": 3520, "text": "Vardenis"},
+       {"value": 3552, "text": "Mets Ishxanasar"}
+    ]
+  },
+  "polar": {
+    "header": "Administrative divisions of Armenia (population)",
+    "data": [
+      {"value": 129800, "text": "Aragatsotn"},
+      {"value": 258900, "text": "Ararat"},
+      {"value": 266600, "text": "Armavir"},
+      {"value": 231800, "text": "Gegharkunik"},
+      {"value": 253900, "text": "Kotayk"},
+      {"value": 225000, "text": "Lori"},
+      {"value": 243200, "text": "Shirak"},
+      {"value": 139400, "text": "Syunik"},
+      {"value": 125500, "text": "Tavush"},
+      {"value": 50800, "text": "Vayots Dzor"}
+    ]
+  }
+}
