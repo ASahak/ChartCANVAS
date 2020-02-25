@@ -87,11 +87,6 @@ export function Bar (options, canvas, self, _legendInfo, dataChart) {
         requestAnimationFrame(this.__animate.bind(this))
     })
         .domElement.parentElement.setAttribute('style', `pointer-events: ${this._self._labelsY.display ? 'auto' : 'none'}; opacity: ${this._self._labelsY.display ? 1 : 0.5}`);
-    const legendBar = barFolder.addFolder('Legend');
-    legendBar.add(this._self, '_legend').name('Display')
-        .onChange(() => {
-            requestAnimationFrame(this.__animate.bind(this))
-        });
     barFolder.open()
 }
 Bar.prototype.__setAxisYLine = function (_displayX) {
@@ -178,7 +173,7 @@ Bar.prototype.__setCoordinatesNet = function (_displayY) {
             maxCeil *= 10;
             this._legendInfo.info1 = 'x1000'
         } else if (_maxValue > 999) {
-            maxCeil *= 1;
+            maxCeil *= 1000;
             this._legendInfo.info1 = 'x1000'
         } else if (_maxValue > 99) {
             maxCeil *= 100;
@@ -232,12 +227,6 @@ Bar.prototype.__setCoordinatesNet = function (_displayY) {
     }
 };
 Bar.prototype.__beforeChanging = function () {
-    if (this._self._legend) {
-        this._self._paddingXTop = 30
-    } else {
-        this._self._paddingXTop = 10
-    }
-
     let [_maxValue] = [
         this._self._result.__max_min_values(this._configuration.data.datasets.data).max
     ];
@@ -245,9 +234,9 @@ Bar.prototype.__beforeChanging = function () {
     if (this._self._labelsY.display) {
         this._self._canvas.font = this._self._labelsY.fontSize + 'px Arial';
         if (_maxValue.toString().split('').length > 9) {
-            this._self._paddingYLeft = this._self._canvas.measureText('0000').width + 10
+            this._self._paddingYLeft = this._self._canvas.measureText('00000').width + 10
         } else {
-            this._self._paddingYLeft = this._self._canvas.measureText('000').width + 10
+            this._self._paddingYLeft = this._self._canvas.measureText('0000').width + 10
         }
     } else {
         this._self._paddingYLeft = 10
@@ -357,25 +346,12 @@ Bar.prototype.__drawBars = function (onChange) {
         this._self._canvas.closePath();
     })
 };
-Bar.prototype.__setLegend = function (percpective) {
-    if (this._self._legend) {
-        this._self._canvas.font = '16px Arial';
-        this._self._canvas.textAlign = "left";
-        this._self._canvas.fillStyle = 'rgb(20, 17, 17)';
-        this._self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${this._legendInfo.info2}`, (() => {
-            let text = 'Predicted world population ' + `(${percpective}) in ${this._legendInfo.info2}`
-            let widthTxt = this._self._canvas.measureText(text).width
-            return (this._self._widthCanvas / 2  - widthTxt / 2)
-        })(), 15);
-        this._self._canvas.clearColor;
-    }
-};
 Bar.prototype.__draw = function () {
     this.__beforeChanging();
     this.__setAxisX(this._self._labelsX.display);
     this.__setAxisY(this._self._labelsX.display, this._self._labelsY.display);
     this.__setCoordinatesNet(this._self._labelsY.display);
-    this.__setLegend(this._legendInfo.info1);
+    this._self._result.__setHeader(this._legendInfo.header);
     this.__drawBars(this.animateBars);
 };
 Bar.prototype.__update = function () {
@@ -417,8 +393,8 @@ Bar.prototype.__animate = function () {
                         }
                         _tooltipElement.setAttribute('id', className);
                         _tooltipElement.innerHTML = `
-                                <p>${this._dataChart[this._legendInfo.info2][Number(_)].text}</p>
-                                <p>${this._dataChart[this._legendInfo.info2][Number(_)].value}</p>
+                                <p>${this._dataChart[Number(_)].text}</p>
+                                <p>${this._dataChart[Number(_)].value}</p>
                             `;
                         _tooltipElement.style.cssText = `
                                 top: ${_top}px;
@@ -453,19 +429,18 @@ Bar.prototype.__init = function () {
         this.__animate()
     }, 0)
 };
-export const ParametersBar = (_dataChart, _legendInfo) => {
+export const ParametersBar = (_dataChart) => {
     return {
         type: 'bar',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
                 borderColor: [175, 160, 160],
                 borderOpacity: 1
             }
         },
         options: {
-            legend: true,
             bars: {
                 backgroundColors: { one: '#F21103', two: '#F86300', three: '#F7C601'},
                 mouseMove: {

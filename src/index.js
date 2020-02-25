@@ -7,11 +7,34 @@ require('./styles/style.css');
 const canvas = document.querySelector('#chart');
 const canvasParent = canvas.parentElement;
 
-const _legendInfo = {
-    info1: null,
-    info2: 2019,
-    keys: [2009, 2014, 2019]
-};
+let type = 'polar';
+let _legendInfo = {};
+if (type === 'line') {
+    _legendInfo = {
+        header: dummyData.line.header,
+        info1: null,
+        info2: Object.keys(dummyData.line.data)[0],
+        keys: [...Object.keys(dummyData.line.data)]
+    };
+} else if (type === 'bar') {
+    _legendInfo = {
+        header: dummyData.bar.header,
+        info1: null,
+        info2: dummyData.line.data,
+    };
+} else if (type === 'pie') {
+    _legendInfo = {
+        header: dummyData.pie.header,
+        info1: null,
+        info2: dummyData.pie.data,
+    };
+} else if (type === 'polar') {
+    _legendInfo = {
+        header: dummyData.polar.header,
+        info1: null,
+        info2: dummyData.polar.data,
+    };
+}
 function ChartArt (selector) {
     const self              = this;
     this._result            = null;
@@ -20,16 +43,16 @@ function ChartArt (selector) {
     this._widthCanvas       = 800;
     function Result (elem, options) {
         if (options) {
-            // this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData.data);
+            // this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData[type].data);
             // this.bar.__init();
-            // this.pie     = new Pie(canvas, self, _legendInfo, dummyData.data);
+            // this.pie     = new Pie(canvas, self, _legendInfo, dummyData[type].data);
             // this.pie.__init();
-            // this.polar   = new Polar(canvas, self, _legendInfo, dummyData.data);
-            // Object.assign(this.polar.__proto__, Pie.prototype);
-            // this.polar.__initP();
+            this.polar   = new Polar(canvas, self, _legendInfo, dummyData[type].data);
+            Object.assign(this.polar.__proto__, Pie.prototype);
+            this.polar.__initP();
 
-            this.line       = new Line(options, canvas, self, _legendInfo);
-            this.line.__initL();
+            // this.line       = new Line(options, canvas, self, _legendInfo);
+            // this.line.__initL();
         }
     }
 
@@ -101,6 +124,7 @@ function ChartArt (selector) {
         }
         const label = document.createElement("H1");
         label.innerText = text;
+        label.style.width = self._widthCanvas + 'px';
         label.style.textAlign = 'center';
         canvasParent.querySelector('canvas').insertAdjacentElement('beforeBegin', label)
     };
@@ -225,7 +249,6 @@ function ChartArt (selector) {
         self._bars                    = parameters.options.bars;
         self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
         self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
-        self._legend                  = parameters.options.legend;
         self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
         self._paddingXBottom          = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
         self._paddingYRight           = parameters.options.padding && parameters.options.padding.paddingRight || 10;
@@ -286,5 +309,4 @@ function ChartArt (selector) {
     return new Result(selector)
 }
 
-// For Line Chart
-new ChartArt(canvas).__init(ParametersLine(dummyData.data, _legendInfo));
+new ChartArt(canvas).__init(ParametersPolar(dummyData[type].data));

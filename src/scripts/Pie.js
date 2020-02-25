@@ -19,7 +19,7 @@ export function Pie (canvas, self, _legendInfo, dataChart) {
     this._legendSize     = null;
     this._cx             = this._radius;
     this._cy             = this._radius;
-    this._dataChart[this._legendInfo.info2].map(_ => {
+    this._dataChart.map(_ => {
         this._labels.push(_.text);
         this._values.push(_.value);
         this._totalValues += _.value
@@ -110,16 +110,16 @@ Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRa
 Pie.prototype.__generatePieAngles = function (count) {
     if (count === 0) {
         this._angles.begin.push(0)
-        this._angles.end.push((Math.PI * 2) * (this._values[0] / this._totalValues))
+        this._angles.end.push(+(Math.PI * 2) * (this._values[0] / this._totalValues).toFixed(4))
     } else {
         this._angles.begin.push((() =>  {
             let a = 0;
-            a += this._angles.begin[count - 1] + (Math.PI * 2) * (this._values[count - 1] / this._totalValues);
+            a += +(this._angles.begin[count - 1] + (Math.PI * 2) * (this._values[count - 1] / this._totalValues)).toFixed(4);
             return a
         })());
         this._angles.end.push((() =>  {
             let a = 0;
-            a += this._angles.end[count -1] + (Math.PI * 2) * (this._values[count] / this._totalValues);
+            a += +(this._angles.end[count -1] + (Math.PI * 2) * (this._values[count] / this._totalValues)).toFixed(4);
             return a
         })())
     }
@@ -179,10 +179,12 @@ function SinglePies (self, _x, _y, everyAngle, startAngle, endAngle, radius, col
 }
 SinglePies.prototype.__update = function () {
     const $interval = window.setInterval(() => {
-        if (this._limitAngle >= this._endAngle) {
+        this._limitAngle+= +this._everyAngle;
+        if (+this._limitAngle.toFixed(4) >= +this._endAngle.toFixed(4)) {
+            this._limitAngle = +this._endAngle.toFixed(4);
             window.clearInterval($interval);
+            this.__draw();
         } else {
-            this._limitAngle+=this._everyAngle
             this.__draw()
         }
     }, 30);
@@ -243,7 +245,6 @@ Pie.prototype.__mouseEnterArea = function (realAngle, _index, _hint, _constructo
                 _constructor[_hint][+_constructor._prevId.split('_')[1]].__draw();
             }
         }
-
         const MesureText = (arr, _index, type) => {
             if (type === 'integer') {
                 let text = _constructor._divider ? Math.round(arr[_index] / _constructor._divider) + ' ' + _constructor._dividerText : arr[_index];
@@ -403,6 +404,7 @@ Pie.prototype.__init = async function () {
     this._colors = [];
     this._self._canvas.clearRect(0, 0, this._self._widthCanvas, this._self._heightCanvas);
     await setTimeout(() => {
+        this._self._result.__setHeader(this._legendInfo.header)
         this._labels.map(_j => this._colors.push(this._self._result.__getRandomColor()));
         (() => {
             if (this._self._legends_pie.display) {
@@ -414,11 +416,11 @@ Pie.prototype.__init = async function () {
         })();
         this._values.forEach((_, index)=> {
             this.__generatePieAngles(index);
-            this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
+            this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]]);
             this._pieParts.push(new SinglePies(
                 this._self,
                 this._cx, this._cy,
-                (this._angles.end[index] - this._angles.begin[index]) / 30,
+                +((this._angles.end[index] - this._angles.begin[index]) / 30).toFixed(4),
                 this._angles.begin[index],
                 this._angles.end[index],
                 this._radius,
@@ -426,12 +428,16 @@ Pie.prototype.__init = async function () {
                 index,
                 this._self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
             ));
-            this._pieParts[index].__update()
         });
+        this._values.map((_, index)=>{
+            this._pieParts[index].__update()
+        })
     }, 0);
     await this._canvasElement.addEventListener('mousemove', (event) => {
-        const diffX = event.pageX - this._cx;
-        const diffY = event.pageY - this._cy;
+        const pageY = event.pageY - this._canvasElement.offsetTop;
+        const pageX = event.pageX - this._canvasElement.offsetLeft;
+        const diffX = pageX - this._cx;
+        const diffY = pageY - this._cy;
         let angle = Math.atan2(diffY, diffX);
         let _allowAreaForHover = false;
         let realAngle = angle;
@@ -440,8 +446,8 @@ Pie.prototype.__init = async function () {
         }
         if (this._self._legends_pie.display) {
             for (let i = 0; i < this._labelsPosition.length; i++) {
-                if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
-                    event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                if (pageX >= this._labelsPosition[i].left && pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                    pageY >= this._labelsPosition[i].top && pageY <= this._labelsPosition[i].top + 13
                 ) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
@@ -449,7 +455,7 @@ Pie.prototype.__init = async function () {
                 }
             }
         }
-        if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
+        if (this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._radius)){
             this._betweenAngles.map((_angles, _index) => {
                 if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
                     _allowAreaForHover = true;
@@ -463,17 +469,17 @@ Pie.prototype.__init = async function () {
     });
 };
 
-export const ParametersPie = (_dataChart, _legendInfo) => {
+export const ParametersPie = (_dataChart) => {
     return {
         type: 'pie',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
                 legends: {
                     display: true,
                     position: 'bottom'
                 },
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
             }
         },
         options: {

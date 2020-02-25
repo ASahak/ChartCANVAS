@@ -3059,11 +3059,34 @@ __webpack_require__(/*! ./styles/style.css */ "./src/styles/style.css");
 const canvas = document.querySelector('#chart');
 const canvasParent = canvas.parentElement;
 
-const _legendInfo = {
-    info1: null,
-    info2: 2019,
-    keys: [2009, 2014, 2019]
-};
+let type = 'polar';
+let _legendInfo = {};
+if (type === 'line') {
+    _legendInfo = {
+        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.header,
+        info1: null,
+        info2: Object.keys(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data)[0],
+        keys: [...Object.keys(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data)]
+    };
+} else if (type === 'bar') {
+    _legendInfo = {
+        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.bar.header,
+        info1: null,
+        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data,
+    };
+} else if (type === 'pie') {
+    _legendInfo = {
+        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.pie.header,
+        info1: null,
+        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.pie.data,
+    };
+} else if (type === 'polar') {
+    _legendInfo = {
+        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.polar.header,
+        info1: null,
+        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.polar.data,
+    };
+}
 function ChartArt (selector) {
     const self              = this;
     this._result            = null;
@@ -3072,16 +3095,16 @@ function ChartArt (selector) {
     this._widthCanvas       = 800;
     function Result (elem, options) {
         if (options) {
-            // this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData.data);
+            // this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData[type].data);
             // this.bar.__init();
-            // this.pie     = new Pie(canvas, self, _legendInfo, dummyData.data);
+            // this.pie     = new Pie(canvas, self, _legendInfo, dummyData[type].data);
             // this.pie.__init();
-            // this.polar   = new Polar(canvas, self, _legendInfo, dummyData.data);
-            // Object.assign(this.polar.__proto__, Pie.prototype);
-            // this.polar.__initP();
+            this.polar   = new _scripts_Polar_js__WEBPACK_IMPORTED_MODULE_4__["Polar"](canvas, self, _legendInfo, _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+            Object.assign(this.polar.__proto__, _scripts_Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"].prototype);
+            this.polar.__initP();
 
-            this.line       = new _scripts_Line_js__WEBPACK_IMPORTED_MODULE_1__["Line"](options, canvas, self, _legendInfo);
-            this.line.__initL();
+            // this.line       = new Line(options, canvas, self, _legendInfo);
+            // this.line.__initL();
         }
     }
 
@@ -3153,6 +3176,7 @@ function ChartArt (selector) {
         }
         const label = document.createElement("H1");
         label.innerText = text;
+        label.style.width = self._widthCanvas + 'px';
         label.style.textAlign = 'center';
         canvasParent.querySelector('canvas').insertAdjacentElement('beforeBegin', label)
     };
@@ -3277,7 +3301,6 @@ function ChartArt (selector) {
         self._bars                    = parameters.options.bars;
         self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
         self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
-        self._legend                  = parameters.options.legend;
         self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
         self._paddingXBottom          = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
         self._paddingYRight           = parameters.options.padding && parameters.options.padding.paddingRight || 10;
@@ -3338,9 +3361,7 @@ function ChartArt (selector) {
     return new Result(selector)
 }
 
-// For Line Chart
-new ChartArt(canvas).__init(Object(_scripts_Line_js__WEBPACK_IMPORTED_MODULE_1__["ParametersLine"])(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.data, _legendInfo));
-
+new ChartArt(canvas).__init(Object(_scripts_Polar_js__WEBPACK_IMPORTED_MODULE_4__["ParametersPolar"])(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data));
 
 /***/ }),
 
@@ -3445,11 +3466,6 @@ function Bar (options, canvas, self, _legendInfo, dataChart) {
         requestAnimationFrame(this.__animate.bind(this))
     })
         .domElement.parentElement.setAttribute('style', `pointer-events: ${this._self._labelsY.display ? 'auto' : 'none'}; opacity: ${this._self._labelsY.display ? 1 : 0.5}`);
-    const legendBar = barFolder.addFolder('Legend');
-    legendBar.add(this._self, '_legend').name('Display')
-        .onChange(() => {
-            requestAnimationFrame(this.__animate.bind(this))
-        });
     barFolder.open()
 }
 Bar.prototype.__setAxisYLine = function (_displayX) {
@@ -3536,7 +3552,7 @@ Bar.prototype.__setCoordinatesNet = function (_displayY) {
             maxCeil *= 10;
             this._legendInfo.info1 = 'x1000'
         } else if (_maxValue > 999) {
-            maxCeil *= 1;
+            maxCeil *= 1000;
             this._legendInfo.info1 = 'x1000'
         } else if (_maxValue > 99) {
             maxCeil *= 100;
@@ -3590,12 +3606,6 @@ Bar.prototype.__setCoordinatesNet = function (_displayY) {
     }
 };
 Bar.prototype.__beforeChanging = function () {
-    if (this._self._legend) {
-        this._self._paddingXTop = 30
-    } else {
-        this._self._paddingXTop = 10
-    }
-
     let [_maxValue] = [
         this._self._result.__max_min_values(this._configuration.data.datasets.data).max
     ];
@@ -3603,9 +3613,9 @@ Bar.prototype.__beforeChanging = function () {
     if (this._self._labelsY.display) {
         this._self._canvas.font = this._self._labelsY.fontSize + 'px Arial';
         if (_maxValue.toString().split('').length > 9) {
-            this._self._paddingYLeft = this._self._canvas.measureText('0000').width + 10
+            this._self._paddingYLeft = this._self._canvas.measureText('00000').width + 10
         } else {
-            this._self._paddingYLeft = this._self._canvas.measureText('000').width + 10
+            this._self._paddingYLeft = this._self._canvas.measureText('0000').width + 10
         }
     } else {
         this._self._paddingYLeft = 10
@@ -3715,25 +3725,12 @@ Bar.prototype.__drawBars = function (onChange) {
         this._self._canvas.closePath();
     })
 };
-Bar.prototype.__setLegend = function (percpective) {
-    if (this._self._legend) {
-        this._self._canvas.font = '16px Arial';
-        this._self._canvas.textAlign = "left";
-        this._self._canvas.fillStyle = 'rgb(20, 17, 17)';
-        this._self._canvas.fillText('Predicted world population ' + `(${percpective}) in ${this._legendInfo.info2}`, (() => {
-            let text = 'Predicted world population ' + `(${percpective}) in ${this._legendInfo.info2}`
-            let widthTxt = this._self._canvas.measureText(text).width
-            return (this._self._widthCanvas / 2  - widthTxt / 2)
-        })(), 15);
-        this._self._canvas.clearColor;
-    }
-};
 Bar.prototype.__draw = function () {
     this.__beforeChanging();
     this.__setAxisX(this._self._labelsX.display);
     this.__setAxisY(this._self._labelsX.display, this._self._labelsY.display);
     this.__setCoordinatesNet(this._self._labelsY.display);
-    this.__setLegend(this._legendInfo.info1);
+    this._self._result.__setHeader(this._legendInfo.header);
     this.__drawBars(this.animateBars);
 };
 Bar.prototype.__update = function () {
@@ -3775,8 +3772,8 @@ Bar.prototype.__animate = function () {
                         }
                         _tooltipElement.setAttribute('id', className);
                         _tooltipElement.innerHTML = `
-                                <p>${this._dataChart[this._legendInfo.info2][Number(_)].text}</p>
-                                <p>${this._dataChart[this._legendInfo.info2][Number(_)].value}</p>
+                                <p>${this._dataChart[Number(_)].text}</p>
+                                <p>${this._dataChart[Number(_)].value}</p>
                             `;
                         _tooltipElement.style.cssText = `
                                 top: ${_top}px;
@@ -3811,19 +3808,18 @@ Bar.prototype.__init = function () {
         this.__animate()
     }, 0)
 };
-const ParametersBar = (_dataChart, _legendInfo) => {
+const ParametersBar = (_dataChart) => {
     return {
         type: 'bar',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
                 borderColor: [175, 160, 160],
                 borderOpacity: 1
             }
         },
         options: {
-            legend: true,
             bars: {
                 backgroundColors: { one: '#F21103', two: '#F86300', three: '#F7C601'},
                 mouseMove: {
@@ -4344,7 +4340,7 @@ Line.prototype.__update = function () {
     let years = this._data.map((year, index) => {
         return this._clickedLegends[index] ? this._legendInfo.keys[index] : ''
     });
-    this._self._result.__setHeader('Predicted world population in ' + years.join(' '));
+    this._self._result.__setHeader(this._legendInfo.header + years.join(' '));
     this._self.constructor.__maxValueInit(this._configuration);
     this.__draw(this._data)
 };
@@ -4408,16 +4404,15 @@ Line.prototype.__initL = async function () {
     }, 0)
 };
 const ParametersLine = (_dataChart, _legendInfo) => {
+    const _dataLine = [];
+    _legendInfo.keys.map(_ =>
+        _dataLine.push(_dataChart[_]));
     return {
         type: 'line',
         data: {
             labels: _dataChart[_legendInfo.info2].map(_ => _.text),
             datasets: {
-                data: [
-                    _dataChart['2009'],
-                    _dataChart['2014'],
-                    _dataChart[_legendInfo.info2],
-                ]
+                data: _dataLine,
             }
         },
         options: {
@@ -4498,7 +4493,7 @@ function Pie (canvas, self, _legendInfo, dataChart) {
     this._legendSize     = null;
     this._cx             = this._radius;
     this._cy             = this._radius;
-    this._dataChart[this._legendInfo.info2].map(_ => {
+    this._dataChart.map(_ => {
         this._labels.push(_.text);
         this._values.push(_.value);
         this._totalValues += _.value
@@ -4589,16 +4584,16 @@ Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRa
 Pie.prototype.__generatePieAngles = function (count) {
     if (count === 0) {
         this._angles.begin.push(0)
-        this._angles.end.push((Math.PI * 2) * (this._values[0] / this._totalValues))
+        this._angles.end.push(+(Math.PI * 2) * (this._values[0] / this._totalValues).toFixed(4))
     } else {
         this._angles.begin.push((() =>  {
             let a = 0;
-            a += this._angles.begin[count - 1] + (Math.PI * 2) * (this._values[count - 1] / this._totalValues);
+            a += +(this._angles.begin[count - 1] + (Math.PI * 2) * (this._values[count - 1] / this._totalValues)).toFixed(4);
             return a
         })());
         this._angles.end.push((() =>  {
             let a = 0;
-            a += this._angles.end[count -1] + (Math.PI * 2) * (this._values[count] / this._totalValues);
+            a += +(this._angles.end[count -1] + (Math.PI * 2) * (this._values[count] / this._totalValues)).toFixed(4);
             return a
         })())
     }
@@ -4658,10 +4653,12 @@ function SinglePies (self, _x, _y, everyAngle, startAngle, endAngle, radius, col
 }
 SinglePies.prototype.__update = function () {
     const $interval = window.setInterval(() => {
-        if (this._limitAngle >= this._endAngle) {
+        this._limitAngle+= +this._everyAngle;
+        if (+this._limitAngle.toFixed(4) >= +this._endAngle.toFixed(4)) {
+            this._limitAngle = +this._endAngle.toFixed(4);
             window.clearInterval($interval);
+            this.__draw();
         } else {
-            this._limitAngle+=this._everyAngle
             this.__draw()
         }
     }, 30);
@@ -4722,7 +4719,6 @@ Pie.prototype.__mouseEnterArea = function (realAngle, _index, _hint, _constructo
                 _constructor[_hint][+_constructor._prevId.split('_')[1]].__draw();
             }
         }
-
         const MesureText = (arr, _index, type) => {
             if (type === 'integer') {
                 let text = _constructor._divider ? Math.round(arr[_index] / _constructor._divider) + ' ' + _constructor._dividerText : arr[_index];
@@ -4882,6 +4878,7 @@ Pie.prototype.__init = async function () {
     this._colors = [];
     this._self._canvas.clearRect(0, 0, this._self._widthCanvas, this._self._heightCanvas);
     await setTimeout(() => {
+        this._self._result.__setHeader(this._legendInfo.header)
         this._labels.map(_j => this._colors.push(this._self._result.__getRandomColor()));
         (() => {
             if (this._self._legends_pie.display) {
@@ -4893,11 +4890,11 @@ Pie.prototype.__init = async function () {
         })();
         this._values.forEach((_, index)=> {
             this.__generatePieAngles(index);
-            this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]])
+            this._betweenAngles.push([this._angles.begin[index], this._angles.end[index]]);
             this._pieParts.push(new SinglePies(
                 this._self,
                 this._cx, this._cy,
-                (this._angles.end[index] - this._angles.begin[index]) / 30,
+                +((this._angles.end[index] - this._angles.begin[index]) / 30).toFixed(4),
                 this._angles.begin[index],
                 this._angles.end[index],
                 this._radius,
@@ -4905,12 +4902,16 @@ Pie.prototype.__init = async function () {
                 index,
                 this._self._result.__colorLuminance(this._colors[index % this._colors.length], -0.2 /*[0] -- returns true color; [0.2] -- returns lighter; [-0.2] -- returns darker*/)
             ));
-            this._pieParts[index].__update()
         });
+        this._values.map((_, index)=>{
+            this._pieParts[index].__update()
+        })
     }, 0);
     await this._canvasElement.addEventListener('mousemove', (event) => {
-        const diffX = event.pageX - this._cx;
-        const diffY = event.pageY - this._cy;
+        const pageY = event.pageY - this._canvasElement.offsetTop;
+        const pageX = event.pageX - this._canvasElement.offsetLeft;
+        const diffX = pageX - this._cx;
+        const diffY = pageY - this._cy;
         let angle = Math.atan2(diffY, diffX);
         let _allowAreaForHover = false;
         let realAngle = angle;
@@ -4919,8 +4920,8 @@ Pie.prototype.__init = async function () {
         }
         if (this._self._legends_pie.display) {
             for (let i = 0; i < this._labelsPosition.length; i++) {
-                if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
-                    event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                if (pageX >= this._labelsPosition[i].left && pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                    pageY >= this._labelsPosition[i].top && pageY <= this._labelsPosition[i].top + 13
                 ) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
@@ -4928,7 +4929,7 @@ Pie.prototype.__init = async function () {
                 }
             }
         }
-        if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
+        if (this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._radius)){
             this._betweenAngles.map((_angles, _index) => {
                 if (realAngle >= _angles[0] && realAngle <= _angles[1]) {
                     _allowAreaForHover = true;
@@ -4942,17 +4943,17 @@ Pie.prototype.__init = async function () {
     });
 };
 
-const ParametersPie = (_dataChart, _legendInfo) => {
+const ParametersPie = (_dataChart) => {
     return {
         type: 'pie',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
                 legends: {
                     display: true,
                     position: 'bottom'
                 },
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
             }
         },
         options: {
@@ -5001,7 +5002,7 @@ function Polar (canvas, self, _legendInfo, dataChart) {
     this._legendSize     = null;
     this._cx             = this._radius;
     this._cy             = this._radius;
-    this._dataChart[this._legendInfo.info2].map(_ => {
+    this._dataChart.map(_ => {
         this._labels.push(_.text);
         this._values.push(_.value);
         this._totalValues += _.value
@@ -5173,6 +5174,7 @@ Polar.prototype.__initP = async function () {
     this._countPolars = -1;
     this._self._canvas.clearRect(0, 0, this._self._widthCanvas, this._self._heightCanvas);
     await setTimeout(() => {
+        this._self._result.__setHeader(this._legendInfo.header);
         this._labels.map(_j => this._colors.push(this._self._result.__getRandomColor()));
         (() => {
             if (this._self._legends_polar.display) {
@@ -5214,8 +5216,10 @@ Polar.prototype.__initP = async function () {
         }, 200)
     }, 0);
     await this._canvasElement.addEventListener('mousemove', (event) => {
-        const diffX = event.pageX - this._cx;
-        const diffY = event.pageY - this._cy;
+        const pageY = event.pageY - this._canvasElement.offsetTop;
+        const pageX = event.pageX - this._canvasElement.offsetLeft;
+        const diffX = pageX - this._cx;
+        const diffY = pageY - this._cy;
         let angle = Math.atan2(diffY, diffX);
         let _allowAreaForHover = false;
         let realAngle = angle;
@@ -5224,8 +5228,8 @@ Polar.prototype.__initP = async function () {
         }
         if (this._self._legends_polar.display) {
             for (let i = 0; i < this._labelsPosition.length; i++) {
-                if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
-                    event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                if (pageX >= this._labelsPosition[i].left && pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                    pageY >= this._labelsPosition[i].top && pageY <= this._labelsPosition[i].top + 13
                 ) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
@@ -5233,16 +5237,16 @@ Polar.prototype.__initP = async function () {
                 }
             }
         }
-        if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
+        if (this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._radius)){
             for (let _index = 0; _index < this._betweenAngles.length; _index++) {
                 if (realAngle >= this._betweenAngles[_index][0] && realAngle <= this._betweenAngles[_index][1] &&
-                    this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                    this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
                     this.__mouseEnterArea(realAngle, _index, '_polarParts', this, 'polar', this._self._legends_position_polar, this._self._legends_polar);
                     break;
                 } else if ((this._self._onHover_polar || this._prevId) &&
-                    !this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                    !this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
                     !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', this._self._legends_position_polar, 'polar', this._self._legends_polar);
                 }
             }
@@ -5251,17 +5255,17 @@ Polar.prototype.__initP = async function () {
         }
     })
 };
-const ParametersPolar = (_dataChart, _legendInfo) => {
+const ParametersPolar = (_dataChart) => {
     return{
         type: 'polar',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
                 legends: {
                     display: true,
                     position: 'bottom'
                 },
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
             }
         },
         options: {
@@ -5277,14 +5281,88 @@ const ParametersPolar = (_dataChart, _legendInfo) => {
 
 /***/ }),
 
+/***/ "./src/scripts/components/app.js":
+/*!***************************************!*\
+  !*** ./src/scripts/components/app.js ***!
+  \***************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header */ "./src/scripts/components/header.js");
+
+
+/***/ }),
+
+/***/ "./src/scripts/components/header.js":
+/*!******************************************!*\
+  !*** ./src/scripts/components/header.js ***!
+  \******************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _helpers_constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/constants */ "./src/scripts/helpers/constants.js");
+
+
+customElements.define('app-header',
+    class AppHeader extends HTMLElement{
+        constructor () {
+            super();
+            this._shadowRoot = this.attachShadow({mode: 'open'});
+        }
+        static get observedAttributes () {
+            return ['active-chart'];
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            switch (name) {
+                case 'active-chart':
+                    console.log(`Value changed from ${oldValue} to ${newValue}`);
+                    break;
+            }
+        }
+        connectedCallback() {
+            this.setLogo(this._shadowRoot)
+            console.log(this.activeChart, _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["tabCharts"]);
+        }
+        get activeChart () {
+            return this.getAttribute('active-chart')
+        }
+        setLogo (ref) {
+            const _logo = document.createElement('IMG');
+            _logo.src = './images/logo.png';
+            ref.appendChild(_logo);
+        }
+    }
+);
+
+/***/ }),
+
 /***/ "./src/scripts/dummyData.json":
 /*!************************************!*\
   !*** ./src/scripts/dummyData.json ***!
   \************************************/
-/*! exports provided: header, data, default */
+/*! exports provided: line, bar, pie, polar, default */
 /***/ (function(module) {
 
-module.exports = JSON.parse("{\"header\":\"Predicted world population \",\"data\":{\"2009\":[{\"value\":704000000,\"text\":\"Africa\"},{\"value\":506000000,\"text\":\"N. America\"},{\"value\":338000000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3150000000,\"text\":\"Asia\"},{\"value\":696000000,\"text\":\"Europa\"},{\"value\":17000000,\"text\":\"Australia\"}],\"2014\":[{\"value\":780000000,\"text\":\"Africa\"},{\"value\":560000000,\"text\":\"N. America\"},{\"value\":350000000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3600000000,\"text\":\"Asia\"},{\"value\":727000000,\"text\":\"Europa\"},{\"value\":20000000,\"text\":\"Australia\"}],\"2019\":[{\"value\":788000000,\"text\":\"Africa\"},{\"value\":578000000,\"text\":\"N. America\"},{\"value\":398000000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3780000000,\"text\":\"Asia\"},{\"value\":769000000,\"text\":\"Europa\"},{\"value\":27000000,\"text\":\"Australia\"}]}}");
+module.exports = JSON.parse("{\"line\":{\"header\":\"List of continents by population in \",\"data\":{\"1950\":[{\"value\":228902000,\"text\":\"Africa\"},{\"value\":226719000,\"text\":\"N. America\"},{\"value\":113739000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":1394018000,\"text\":\"Asia\"},{\"value\":549089000,\"text\":\"Europa\"},{\"value\":12682000,\"text\":\"Australia\"}],\"1990\":[{\"value\":631614000,\"text\":\"Africa\"},{\"value\":429653000,\"text\":\"N. America\"},{\"value\":297869000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3202475000,\"text\":\"Asia\"},{\"value\":721086000,\"text\":\"Europa\"},{\"value\":26971000,\"text\":\"Australia\"}],\"2010\":[{\"value\":546867000,\"text\":\"Africa\"},{\"value\":578000000,\"text\":\"N. America\"},{\"value\":397085000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4169850000,\"text\":\"Asia\"},{\"value\":735395000,\"text\":\"Europa\"},{\"value\":36411000,\"text\":\"Australia\"}],\"2020\":[{\"value\":1275920972,\"text\":\"Africa\"},{\"value\":582931600,\"text\":\"N. America\"},{\"value\":423581078,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4560667108,\"text\":\"Asia\"},{\"value\":746419440,\"text\":\"Europa\"},{\"value\":39901000,\"text\":\"Australia\"}]}},\"bar\":{\"header\":\"List of highest mountains on Earth (m)\",\"data\":[{\"value\":8848,\"text\":\"Everest\"},{\"value\":8516,\"text\":\"Lhotse\"},{\"value\":8091,\"text\":\"Anapurna\"},{\"value\":8167,\"text\":\"Dhaulagiri\"},{\"value\":8188,\"text\":\"Cho Oyu\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8126,\"text\":\"Nanga Parbat\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8163,\"text\":\"Manaslu\"},{\"value\":8485,\"text\":\"Makalu\"}]},\"pie\":{\"header\":\"Mountains of Armenia (m)\",\"data\":[{\"value\":4090,\"text\":\"Aragats\"},{\"value\":3906,\"text\":\"Kaputjugh\"},{\"value\":3598,\"text\":\"Azhdahak\"},{\"value\":3594,\"text\":\"Tsxruk\"},{\"value\":3560,\"text\":\"Spitakasar\"},{\"value\":3520,\"text\":\"Vardenis\"},{\"value\":3552,\"text\":\"Mets Ishxanasar\"}]},\"polar\":{\"header\":\"Administrative divisions of Armenia (population)\",\"data\":[{\"value\":129800,\"text\":\"Aragatsotn\"},{\"value\":258900,\"text\":\"Ararat\"},{\"value\":266600,\"text\":\"Armavir\"},{\"value\":231800,\"text\":\"Gegharkunik\"},{\"value\":253900,\"text\":\"Kotayk\"},{\"value\":225000,\"text\":\"Lori\"},{\"value\":243200,\"text\":\"Shirak\"},{\"value\":139400,\"text\":\"Syunik\"},{\"value\":125500,\"text\":\"Tavush\"},{\"value\":50800,\"text\":\"Vayots Dzor\"}]}}");
+
+/***/ }),
+
+/***/ "./src/scripts/helpers/constants.js":
+/*!******************************************!*\
+  !*** ./src/scripts/helpers/constants.js ***!
+  \******************************************/
+/*! exports provided: tabCharts */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tabCharts", function() { return tabCharts; });
+const tabCharts = ['Line', 'Bar', 'Pie', 'Polar'];
 
 /***/ }),
 
@@ -5316,13 +5394,14 @@ if (content.locals) {
 /***/ }),
 
 /***/ 0:
-/*!****************************!*\
-  !*** multi ./src/index.js ***!
-  \****************************/
+/*!************************************************************!*\
+  !*** multi ./src/index.js ./src/scripts/components/app.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! ./src/index.js */"./src/index.js");
+__webpack_require__(/*! ./src/index.js */"./src/index.js");
+module.exports = __webpack_require__(/*! ./src/scripts/components/app.js */"./src/scripts/components/app.js");
 
 
 /***/ })

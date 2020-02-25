@@ -464,7 +464,7 @@ Line.prototype.__update = function () {
     let years = this._data.map((year, index) => {
         return this._clickedLegends[index] ? this._legendInfo.keys[index] : ''
     });
-    this._self._result.__setHeader('Predicted world population in ' + years.join(' '));
+    this._self._result.__setHeader(this._legendInfo.header + years.join(' '));
     this._self.constructor.__maxValueInit(this._configuration);
     this.__draw(this._data)
 };
@@ -528,16 +528,15 @@ Line.prototype.__initL = async function () {
     }, 0)
 };
 export const ParametersLine = (_dataChart, _legendInfo) => {
+    const _dataLine = [];
+    _legendInfo.keys.map(_ =>
+        _dataLine.push(_dataChart[_]));
     return {
         type: 'line',
         data: {
             labels: _dataChart[_legendInfo.info2].map(_ => _.text),
             datasets: {
-                data: [
-                    _dataChart['2009'],
-                    _dataChart['2014'],
-                    _dataChart[_legendInfo.info2],
-                ]
+                data: _dataLine,
             }
         },
         options: {

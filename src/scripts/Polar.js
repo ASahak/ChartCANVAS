@@ -20,7 +20,7 @@ export function Polar (canvas, self, _legendInfo, dataChart) {
     this._legendSize     = null;
     this._cx             = this._radius;
     this._cy             = this._radius;
-    this._dataChart[this._legendInfo.info2].map(_ => {
+    this._dataChart.map(_ => {
         this._labels.push(_.text);
         this._values.push(_.value);
         this._totalValues += _.value
@@ -192,6 +192,7 @@ Polar.prototype.__initP = async function () {
     this._countPolars = -1;
     this._self._canvas.clearRect(0, 0, this._self._widthCanvas, this._self._heightCanvas);
     await setTimeout(() => {
+        this._self._result.__setHeader(this._legendInfo.header);
         this._labels.map(_j => this._colors.push(this._self._result.__getRandomColor()));
         (() => {
             if (this._self._legends_polar.display) {
@@ -233,8 +234,10 @@ Polar.prototype.__initP = async function () {
         }, 200)
     }, 0);
     await this._canvasElement.addEventListener('mousemove', (event) => {
-        const diffX = event.pageX - this._cx;
-        const diffY = event.pageY - this._cy;
+        const pageY = event.pageY - this._canvasElement.offsetTop;
+        const pageX = event.pageX - this._canvasElement.offsetLeft;
+        const diffX = pageX - this._cx;
+        const diffY = pageY - this._cy;
         let angle = Math.atan2(diffY, diffX);
         let _allowAreaForHover = false;
         let realAngle = angle;
@@ -243,8 +246,8 @@ Polar.prototype.__initP = async function () {
         }
         if (this._self._legends_polar.display) {
             for (let i = 0; i < this._labelsPosition.length; i++) {
-                if (event.pageX >= this._labelsPosition[i].left && event.pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
-                    event.pageY >= this._labelsPosition[i].top && event.pageY <= this._labelsPosition[i].top + 13
+                if (pageX >= this._labelsPosition[i].left && pageX <= this._labelsPosition[i].left + this._labelsPosition[i].width &&
+                    pageY >= this._labelsPosition[i].top && pageY <= this._labelsPosition[i].top + 13
                 ) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
@@ -252,16 +255,16 @@ Polar.prototype.__initP = async function () {
                 }
             }
         }
-        if (this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._radius)){
+        if (this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._radius)){
             for (let _index = 0; _index < this._betweenAngles.length; _index++) {
                 if (realAngle >= this._betweenAngles[_index][0] && realAngle <= this._betweenAngles[_index][1] &&
-                    this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                    this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
                     _allowAreaForHover = true;
                     this._canvasElement.style.cursor = 'pointer';
                     this.__mouseEnterArea(realAngle, _index, '_polarParts', this, 'polar', this._self._legends_position_polar, this._self._legends_polar);
                     break;
                 } else if ((this._self._onHover_polar || this._prevId) &&
-                    !this.__pointInCircleSQRT(event.pageX, event.pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
+                    !this.__pointInCircleSQRT(pageX, pageY, this._cx, this._cy, this._polarParts[_index]._radius)) {
                     !_allowAreaForHover && this.__mouseLeaveArea(this, '_polarParts', this._self._legends_position_polar, 'polar', this._self._legends_polar);
                 }
             }
@@ -270,17 +273,17 @@ Polar.prototype.__initP = async function () {
         }
     })
 };
-export const ParametersPolar = (_dataChart, _legendInfo) => {
+export const ParametersPolar = (_dataChart) => {
     return{
         type: 'polar',
         data: {
-            labels: _dataChart[_legendInfo.info2].map(_ => _.text),
+            labels: _dataChart.map(_ => _.text),
             datasets: {
                 legends: {
                     display: true,
                     position: 'bottom'
                 },
-                data: _dataChart[_legendInfo.info2],
+                data: _dataChart,
             }
         },
         options: {
