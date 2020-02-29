@@ -3055,7 +3055,7 @@ function Bar (options, canvas, self, _legendInfo, dataChart) {
     this._legendInfo     = _legendInfo;
     this._self           = self;
     this._barsPositions  = {};
-    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]({resizable : false});
     const barFolder      = this._gui.addFolder('Bar');
     this._configuration  = options;
     this.animateBars     = false;
@@ -3550,7 +3550,7 @@ function Line (options, canvas, self, _legendInfo) {
     this._canvasElement   = canvas;
     this._legendInfo      = _legendInfo;
     this._self            = self;
-    this._gui             = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+    this._gui             = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]({resizable : false});
     const lineFolder      = this._gui.addFolder('Line');
     this._configuration   = options;
     this._data            = this._configuration.data.datasets.data;
@@ -4148,7 +4148,7 @@ function Pie (canvas, self, _legendInfo, dataChart) {
     this._dataChart      = dataChart;
     this._legendInfo     = _legendInfo;
     this._self           = self;
-    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]({resizable : false});
     this._values         = [];
     this._radius         = 150;
     this._colors         = [];
@@ -4656,7 +4656,7 @@ function Polar (canvas, self, _legendInfo, dataChart) {
     this._dataChart      = dataChart;
     this._legendInfo     = _legendInfo;
     this._self           = self;
-    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]();
+    this._gui            = new dat_gui__WEBPACK_IMPORTED_MODULE_0__["GUI"]({resizable : false});
     this._values         = [];
     this._radius         = 150;
     this._colors         = [];
@@ -5255,16 +5255,16 @@ const canvasParent = canvas.parentElement;
         function Result (elem, options) {
             if (options) {
                 if (type === 'Line') {
-                    this.line       = new _Line_js__WEBPACK_IMPORTED_MODULE_1__["Line"](options, canvas, self, _legendInfo);
+                    this.line = new _Line_js__WEBPACK_IMPORTED_MODULE_1__["Line"](options, canvas, self, _legendInfo);
                     this.line.__initL();
                 } else if (type === 'Bar') {
-                    this.bar     = new _Bar_js__WEBPACK_IMPORTED_MODULE_2__["Bar"](options, canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    this.bar = new _Bar_js__WEBPACK_IMPORTED_MODULE_2__["Bar"](options, canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
                     this.bar.__init();
                 } else if (type === 'Pie') {
-                    this.pie     = new _Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    this.pie = new _Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
                     this.pie.__init();
                 } else if (type === 'Polar') {
-                    this.polar   = new _Polar_js__WEBPACK_IMPORTED_MODULE_4__["Polar"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    this.polar = new _Polar_js__WEBPACK_IMPORTED_MODULE_4__["Polar"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
                     Object.assign(this.polar.__proto__, _Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"].prototype);
                     this.polar.__initP();
                 }

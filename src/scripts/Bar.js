@@ -6,7 +6,7 @@ export function Bar (options, canvas, self, _legendInfo, dataChart) {
     this._legendInfo     = _legendInfo;
     this._self           = self;
     this._barsPositions  = {};
-    this._gui            = new dat.GUI();
+    this._gui            = new dat.GUI({resizable : false});
     const barFolder      = this._gui.addFolder('Bar');
     this._configuration  = options;
     this.animateBars     = false;
