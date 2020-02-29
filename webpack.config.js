@@ -3,7 +3,7 @@ const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
     mode: "development",
-    entry: ['./src/index.js', './src/scripts/components/app.js'],
+    entry: ['./src/scripts/components/app.js'],
     module: {
         // loaders: [
         //     {

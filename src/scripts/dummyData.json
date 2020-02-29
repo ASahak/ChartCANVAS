@@ -1,5 +1,5 @@
 {
-  "line": {
+  "Line": {
     "header": "List of continents by population in ",
     "data": {
       "1950": [
@@ -40,7 +40,7 @@
       ]
     }
   },
-  "bar": {
+  "Bar": {
     "header": "List of highest mountains on Earth (m)",
     "data": [
       {"value": 8848, "text": "Everest"},
@@ -55,19 +55,19 @@
       {"value": 8485, "text": "Makalu"}
     ]
   },
-  "pie": {
+  "Pie": {
     "header": "Mountains of Armenia (m)",
     "data": [
-       {"value": 4090, "text": "Aragats"},
-       {"value": 3906, "text": "Kaputjugh"},
-       {"value": 3598, "text": "Azhdahak"},
-       {"value": 3594, "text": "Tsxruk"},
-       {"value": 3560, "text": "Spitakasar"},
-       {"value": 3520, "text": "Vardenis"},
-       {"value": 3552, "text": "Mets Ishxanasar"}
+       {"value": 1326093184, "text": "India"},
+       {"value": 336835520, "text": "US"},
+       {"value": 267532448, "text": "Indonesia"},
+       {"value": 222607504, "text": "Brazil"},
+       {"value": 213719472, "text": "Pakistan"},
+       {"value": 1384545280, "text": "China"},
+       {"value": 207698752, "text": "Nigeria"}
     ]
   },
-  "polar": {
+  "Polar": {
     "header": "Administrative divisions of Armenia (population)",
     "data": [
       {"value": 129800, "text": "Aragatsotn"},
@@ -75,11 +75,11 @@
       {"value": 266600, "text": "Armavir"},
       {"value": 231800, "text": "Gegharkunik"},
       {"value": 253900, "text": "Kotayk"},
+      {"value": 50800, "text": "Vayots Dzor"},
       {"value": 225000, "text": "Lori"},
       {"value": 243200, "text": "Shirak"},
       {"value": 139400, "text": "Syunik"},
-      {"value": 125500, "text": "Tavush"},
-      {"value": 50800, "text": "Vayots Dzor"}
+      {"value": 125500, "text": "Tavush"}
     ]
   }
 }

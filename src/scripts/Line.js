@@ -17,7 +17,6 @@ export function Line (options, canvas, self, _legendInfo) {
     this._clickedLegends  = this._data.map(_ => true);
     this._canvasBadgeWidth= (this._self._widthCanvas - (this._self._paddingYLeftLine + this._self._paddingYRightLine)) / this._configuration.data.labels.length;
 
-    lineFolder.open();
     lineFolder.addColor(this._self, '_borderColorLine').name('Border Color')
         .onChange(() => {
             this._animationDraw = false;

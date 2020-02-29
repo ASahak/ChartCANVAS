@@ -102,7 +102,6 @@ export function Polar (canvas, self, _legendInfo, dataChart) {
                 _class.__draw()
             })
         });
-    _polarFolder.open();
 }
 function SinglePolars (self, movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor, value) {
     this._self       = self;

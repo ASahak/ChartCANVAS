@@ -11,6 +11,7 @@ export function Bar (options, canvas, self, _legendInfo, dataChart) {
     this._configuration  = options;
     this.animateBars     = false;
     this._self._borderColor    = [175, 160, 160];
+
     barFolder.addColor(this._self, '_borderColor').name('Border Color')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
@@ -87,7 +88,6 @@ export function Bar (options, canvas, self, _legendInfo, dataChart) {
         requestAnimationFrame(this.__animate.bind(this))
     })
         .domElement.parentElement.setAttribute('style', `pointer-events: ${this._self._labelsY.display ? 'auto' : 'none'}; opacity: ${this._self._labelsY.display ? 1 : 0.5}`);
-    barFolder.open()
 }
 Bar.prototype.__setAxisYLine = function (_displayX) {
     this._self._canvas.beginPath();

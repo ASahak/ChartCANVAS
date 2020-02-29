@@ -95,7 +95,7 @@
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "body {\r\n    margin: 0;\r\n}\r\n#chart{\r\n    border:1px solid #000;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.show_tooltip{\r\n    transition: cubic-bezier(.075,.82,.165,1) .4s;\r\n    visibility: visible;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
+exports.push([module.i, "body {\r\n    font-family: 'Roboto Condensed';\r\n    margin: 0;\r\n    background: #e1f6ff;\r\n}\r\n.dg.ac{\r\n    transition: 0s;\r\n    transition-property: right;\r\n    transition-duration: .4s;\r\n    top: 70px !important;\r\n}\r\n.dg .main {\r\n    margin-right: 0;\r\n }\r\n.container {\r\n    display: flex;\r\n    justify-content: center;\r\n}\r\n#canvas-parent {\r\n    display: inline-block;\r\n}\r\n#chart{\r\n    border: 1px solid #d9d9d9;\r\n    border-radius: 7px;\r\n    background-color: #fff;\r\n}\r\n/*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/\r\n.tooltip-element-bar {\r\n    position: absolute;\r\n    z-index: 22;\r\n    opacity: 0;\r\n    visibility: hidden;\r\n    background: #2c2c2c;\r\n    padding: 3px;\r\n    height: fit-content;\r\n    color: #fff;\r\n    width: 120px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    border-radius: 6px;\r\n    font-family: sans-serif;\r\n    font-size: 13px;\r\n    flex-direction: column;\r\n}\r\n.show_tooltip{\r\n    transition: cubic-bezier(.075,.82,.165,1) .4s;\r\n    visibility: visible;\r\n}\r\n.tooltip-element-bar p {\r\n    margin: 0;\r\n}\r\n.tooltip-element-bar:after {\r\n    content: '';\r\n    position: absolute;\r\n    margin: auto;\r\n    width: 0;\r\n    transform: rotate(90deg);\r\n    height: 0;\r\n    border-left: 6px solid transparent;\r\n    border-right: 6px solid transparent;\r\n    border-top: 6px solid #2c2c2c;\r\n    clear: both;\r\n}\r\n#to-left:after {\r\n    left: -8px;\r\n    top: 0;\r\n    bottom: 0;\r\n}\r\n#to-left-bottom:after {\r\n    left: -8px;\r\n    bottom: 5px;\r\n}\r\n#to-right-bottom:after {\r\n    right: -8px;\r\n    bottom: 5px;\r\n    transform: rotate(-90deg);\r\n}\r\n#to-right:after {\r\n    right: -8px;\r\n    bottom: 0px;\r\n    top: 0px;\r\n    transform: rotate(-90deg);\r\n}\r\n", ""]);
 
 
 /***/ }),
@@ -3035,336 +3035,6 @@ module.exports = function (list, options) {
 
 /***/ }),
 
-/***/ "./src/index.js":
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./scripts/dummyData */ "./src/scripts/dummyData.json");
-var _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_require__.t(/*! ./scripts/dummyData */ "./src/scripts/dummyData.json", 1);
-/* harmony import */ var _scripts_Line_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scripts/Line.js */ "./src/scripts/Line.js");
-/* harmony import */ var _scripts_Bar_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./scripts/Bar.js */ "./src/scripts/Bar.js");
-/* harmony import */ var _scripts_Pie_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./scripts/Pie.js */ "./src/scripts/Pie.js");
-/* harmony import */ var _scripts_Polar_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./scripts/Polar.js */ "./src/scripts/Polar.js");
-
-
-
-
-
-__webpack_require__(/*! ./styles/style.css */ "./src/styles/style.css");
-const canvas = document.querySelector('#chart');
-const canvasParent = canvas.parentElement;
-
-let type = 'polar';
-let _legendInfo = {};
-if (type === 'line') {
-    _legendInfo = {
-        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.header,
-        info1: null,
-        info2: Object.keys(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data)[0],
-        keys: [...Object.keys(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data)]
-    };
-} else if (type === 'bar') {
-    _legendInfo = {
-        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.bar.header,
-        info1: null,
-        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.line.data,
-    };
-} else if (type === 'pie') {
-    _legendInfo = {
-        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.pie.header,
-        info1: null,
-        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.pie.data,
-    };
-} else if (type === 'polar') {
-    _legendInfo = {
-        header: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.polar.header,
-        info1: null,
-        info2: _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__.polar.data,
-    };
-}
-function ChartArt (selector) {
-    const self              = this;
-    this._result            = null;
-    this._canvas            = selector.getContext('2d');
-    this._heightCanvas      = 500;
-    this._widthCanvas       = 800;
-    function Result (elem, options) {
-        if (options) {
-            // this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData[type].data);
-            // this.bar.__init();
-            // this.pie     = new Pie(canvas, self, _legendInfo, dummyData[type].data);
-            // this.pie.__init();
-            this.polar   = new _scripts_Polar_js__WEBPACK_IMPORTED_MODULE_4__["Polar"](canvas, self, _legendInfo, _scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
-            Object.assign(this.polar.__proto__, _scripts_Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"].prototype);
-            this.polar.__initP();
-
-            // this.line       = new Line(options, canvas, self, _legendInfo);
-            // this.line.__initL();
-        }
-    }
-
-
-    /******************HELPERS***********/
-    this.constructor.__valuesIntegration = function(_values) {
-        const [min, max] = [Math.min(..._values), Math.max(..._values)];
-        if (max > 1000000) {
-            return [1000000, 'M'];
-        } else if (max > 10000 && max < 1000000) {
-            return [1000, 'K'];
-        } else {
-            return [null, null]
-        }
-    };
-    Result.prototype.__convertHex = function (hex,opacity){
-        let hexCode = hex.replace('#',''),
-        r = parseInt(hexCode.substring(0,2), 16),
-        g = parseInt(hexCode.substring(2,4), 16),
-        b = parseInt(hexCode.substring(4,6), 16);
-        const result = 'rgba('+r+','+g+','+b+','+opacity+')';
-        return result;
-    };
-    Result.prototype.__getRandomColor = function () {
-        return '#'+Math.random().toString(16).substr(2,6);
-    };
-    /*___For some color to change more lighter or darker ____*/
-    Result.prototype.__colorLuminance = function (hex, lum) {
-        // validate hex string
-        hex = String(hex).replace(/[^0-9a-f]/gi, '');
-        if (hex.length < 6) {
-            hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-        }
-        lum = lum || 0;
-        // convert to decimal and change luminosity
-        let rgb = "#", c, i;
-        for (i = 0; i < 3; i++) {
-            c = parseInt(hex.substr(i*2,2), 16);
-            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-            rgb += ("00"+c).substr(c.length);
-        }
-        return rgb;
-    };
-    Result.prototype.__fittingString = function (c, str, maxWidth) {
-        let width = c.measureText(str).width;
-        let ellipsis = '…';
-        let ellipsisWidth = c.measureText(ellipsis).width;
-        if (width<=maxWidth || width<=ellipsisWidth) {
-            return str;
-        } else {
-            let len = str.length;
-            while (width>=maxWidth-ellipsisWidth && len-->0) {
-                str = str.substring(0, len);
-                width = c.measureText(str).width;
-            }
-            return str+ellipsis;
-        }
-    };
-    Result.prototype.__max_min_values = function (arr) {
-        let [max, min] = [Math.max(...arr.map(_ => _ instanceof Object ? _.value : _)),
-            Math.min(...arr.map(_ => _ instanceof Object ? _.value : _))]
-        return {
-            max, min
-        }
-    };
-    Result.prototype.__setHeader = function (text) {
-        if (canvasParent.querySelector('h1')) {
-            canvasParent.querySelector('h1').remove();
-        }
-        const label = document.createElement("H1");
-        label.innerText = text;
-        label.style.width = self._widthCanvas + 'px';
-        label.style.textAlign = 'center';
-        canvasParent.querySelector('canvas').insertAdjacentElement('beforeBegin', label)
-    };
-    this.constructor.__maxValue = function (nest, options) {
-        let res;
-        nest.nesting.forEach((_, index) => {
-            if (index < nest.nesting.length - 1){
-                try {
-                    res = options[_]
-                    options = res
-                } catch (err) {
-                    options = res
-                }
-            } else {
-                let _last = nest.nesting.pop()
-                if (res && !res.hasOwnProperty(_)) {
-                    res[_] = nest.emptyProperty
-                } else if (res instanceof Object) {
-                    options[_last] = (options[_last] > nest.value) ? nest.value : res[_last]
-                }
-            }
-        })
-    }
-    /********** ONLY FOR TRANSPARENT COLOR************/
-    this.constructor.__drawLineColor = function (xMoveTo, yMoveTo, xLineTo, yLineTo, dataColor) {
-        const gradient = self._canvas.createLinearGradient(xMoveTo, yMoveTo, xLineTo, yLineTo);
-        let grow = 1 / (dataColor.length - 1);
-        dataColor.forEach((_, index)=> {
-            gradient.addColorStop( grow * index, _);
-        })
-        return gradient
-    };
-
-    this.constructor.__maxValueInit = function (options) {
-        self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
-        if (options.type === 'bar' || options.type === 'line') {
-            [{
-                nesting: ['options', 'scales', 'axisColor'],
-                value: 'rgb(85,72,72)',
-                emptyProperty: 'rgb(85,72,72)'
-            }, {
-                nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['options', 'legend'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
-                value: 16,
-                emptyProperty: 13
-            }, {
-                nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
-                value: 16,
-                emptyProperty: 13
-            }, {
-                nesting: ['options', 'padding', 'paddingTop'],
-                value: 40,
-                emptyProperty: 10
-            }, {
-                nesting: ['options', 'padding', 'paddingBottom'],
-                value: 30,
-                emptyProperty: 20
-            }, {
-                nesting: ['options', 'padding', 'paddingLeft'],
-                value: 50,
-                emptyProperty: 10
-            }, {
-                nesting: ['options', 'padding', 'paddingRight'],
-                value: 50,
-                emptyProperty: 10
-            }, {
-                nesting: ['options', 'bars', 'width'],
-                value: 60,
-                emptyProperty: 40
-            }, {
-                nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'display'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'display'],
-                value: true,
-                emptyProperty: true
-            }].forEach(_ => self.constructor.__maxValue(_, options))
-        } else if (options.type === 'pie' || options.type === 'polar') {
-            [{
-                nesting: ['data', 'datasets', 'legends', 'display'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['data', 'datasets', 'legends', 'position'],
-                value: 'top',
-                emptyProperty: 'top'
-            }, {
-                nesting: ['options', 'onHover', 'tooltip'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['options', 'onHover', 'event'],
-                value: true,
-                emptyProperty: true
-            }, {
-                nesting: ['options', 'lineWidth'],
-                value: 3,
-                emptyProperty: 0.1
-            }, {
-                nesting: ['options', 'axisColor'],
-                value: '#ccc',
-                emptyProperty: '#ccc'
-            }].forEach(_ => self.constructor.__maxValue(_, options))
-        }
-    }
-    /*_________________________________*/
-
-    Result.prototype.__init = function (parameters) {
-        selector.width                = self._widthCanvas;
-        selector.height               = self._heightCanvas;
-        self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
-
-        // For Bar Chart ~~~~~~~~~
-        self._bars                    = parameters.options.bars;
-        self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
-        self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
-        self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
-        self._paddingXBottom          = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
-        self._paddingYRight           = parameters.options.padding && parameters.options.padding.paddingRight || 10;
-        self._paddingXTop             = parameters.options.padding && parameters.options.padding.paddingTop || 10;
-        self._lineYWidth              = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
-        self._lineXWidth              = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
-        self._borderColor             = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || '#000';
-        self._axisColor               = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
-        self._axisOpacity             = 1;
-        self._borderOpacity           = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
-        self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
-        self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
-        self._paddingXBottom          = self._labelsX.display ? self._paddingXBottom: 10;
-        self._paddingYLeft            = self._labelsY.display ? self._paddingYLeft + (50 - self._paddingYLeft): 10;
-        //~~~~~~~~~~~~~~~~~~~~~~
-
-        // For Pie Chart ~~~~~~~~~~~~~~~~~~~
-        self._lineWidth_pie           = parameters.options.lineWidth || 0.1;
-        self._onHover_pie             = parameters.options.onHover && parameters.options.onHover.event;
-        self._tooltip_pie             = parameters.options.onHover && parameters.options.onHover.tooltip;
-        self._legends_pie             = parameters.data.datasets.legends;
-        self._legends_position_pie    = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
-        //~~~~~~~~~~~~~~~~~~~~~~
-
-        // For Polar Chart ~~~~~~~~~~~~~~~~~
-        self._colorAxis_polar         = parameters.options.axisColor || '#ccc';
-        self._lineWidth_polar         = parameters.options.lineWidth || 0.1;
-        self._onHover_polar           = parameters.options.onHover && parameters.options.onHover.event;
-        self._tooltip_polar           = parameters.options.onHover && parameters.options.onHover.tooltip;
-        self._legends_polar           = parameters.data.datasets.legends;
-        self._legends_position_polar  = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
-        // ~~~~~~~~~~~~~~~~~~~~~
-
-        // For Line Chart ~~~~~~~~~~~~~~~~~~~~~~~
-        self._pointTooltip            = (parameters.options.points && parameters.options.points.mouseMove && parameters.options.points.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.points.mouseMove.tooltip : true;
-        self._legendLine              = parameters.options.legend;
-        self._paddingYLeftLine        = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
-        self._paddingXBottomLine      = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
-        self._paddingYRightLine       = parameters.options.padding && parameters.options.padding.paddingRight || 10;
-        self._paddingXTopLine         = parameters.options.padding && parameters.options.padding.paddingTop || 10;
-        self._lineYWidthLine          = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
-        self._lineXWidthLine          = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
-        self._borderColorLine         = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || [227, 225, 225];
-        self._axisColorLine           = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
-        self._axisOpacityLine         = 1;
-        self._lineColors              = parameters.options.lineColors || [];
-        self._borderOpacityLine       = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
-        self._labelsXLine             = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
-        self._labelsYLine             = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
-        self._paddingXBottomLine      = self._labelsXLine.display ? self._paddingXBottomLine: 10;
-        self._paddingYLeftLine        = self._labelsYLine.display ? self._paddingYLeftLine + (50 - self._paddingYLeftLine): 10;
-        self._lineWidth               = parameters.options.lineWidth || 1;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        self._result = new Result(selector, parameters);
-
-        return self._result[parameters.type]
-    };
-    return new Result(selector)
-}
-
-new ChartArt(canvas).__init(Object(_scripts_Polar_js__WEBPACK_IMPORTED_MODULE_4__["ParametersPolar"])(_scripts_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data));
-
-/***/ }),
-
 /***/ "./src/scripts/Bar.js":
 /*!****************************!*\
   !*** ./src/scripts/Bar.js ***!
@@ -3390,6 +3060,7 @@ function Bar (options, canvas, self, _legendInfo, dataChart) {
     this._configuration  = options;
     this.animateBars     = false;
     this._self._borderColor    = [175, 160, 160];
+
     barFolder.addColor(this._self, '_borderColor').name('Border Color')
         .onChange(() => {
             requestAnimationFrame(this.__animate.bind(this))
@@ -3466,7 +3137,6 @@ function Bar (options, canvas, self, _legendInfo, dataChart) {
         requestAnimationFrame(this.__animate.bind(this))
     })
         .domElement.parentElement.setAttribute('style', `pointer-events: ${this._self._labelsY.display ? 'auto' : 'none'}; opacity: ${this._self._labelsY.display ? 1 : 0.5}`);
-    barFolder.open()
 }
 Bar.prototype.__setAxisYLine = function (_displayX) {
     this._self._canvas.beginPath();
@@ -3893,7 +3563,6 @@ function Line (options, canvas, self, _legendInfo) {
     this._clickedLegends  = this._data.map(_ => true);
     this._canvasBadgeWidth= (this._self._widthCanvas - (this._self._paddingYLeftLine + this._self._paddingYRightLine)) / this._configuration.data.labels.length;
 
-    lineFolder.open();
     lineFolder.addColor(this._self, '_borderColorLine').name('Border Color')
         .onChange(() => {
             this._animationDraw = false;
@@ -4503,6 +4172,7 @@ function Pie (canvas, self, _legendInfo, dataChart) {
     this._labelsPosition = [];
     this._prevId         = null;
     this._prevColor      = null;
+
     const _pieFolder     = this._gui.addFolder('Pie');
     _pieFolder.add(self, '_lineWidth_pie', 0.1, 3).name('Space of Pies')
         .onChange(() => {
@@ -4574,7 +4244,6 @@ function Pie (canvas, self, _legendInfo, dataChart) {
                 _class.__draw()
             })
         });
-    _pieFolder.open();
 }
 Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
     const destX = radius * Math.cos(angleRadians) + originX;
@@ -5084,7 +4753,6 @@ function Polar (canvas, self, _legendInfo, dataChart) {
                 _class.__draw()
             })
         });
-    _polarFolder.open();
 }
 function SinglePolars (self, movingX, movingY, startAngle, endAngle, radius, color, index, hoverColor, value) {
     this._self       = self;
@@ -5290,7 +4958,14 @@ const ParametersPolar = (_dataChart) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header */ "./src/scripts/components/header.js");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../index */ "./src/scripts/index.js");
+/* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header */ "./src/scripts/components/header.js");
+/* harmony import */ var _toggleGUI__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./toggleGUI */ "./src/scripts/components/toggleGUI.js");
+/* harmony import */ var _toggleGUI__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_toggleGUI__WEBPACK_IMPORTED_MODULE_2__);
+__webpack_require__(/*! ../../styles/style.css */ "./src/styles/style.css");
+
+
+
 
 
 /***/ }),
@@ -5311,7 +4986,47 @@ customElements.define('app-header',
     class AppHeader extends HTMLElement{
         constructor () {
             super();
-            this._shadowRoot = this.attachShadow({mode: 'open'});
+            this._shadowRoot    = this.attachShadow({mode: 'open'});
+            this._header        = document.createElement('HEADER');
+            const style         = document.createElement('style');
+            style.textContent = `
+                header {     
+                    display: flex;
+                    background-color: #121212;
+                    padding: 15px 7vw;
+                    justify-content: space-between;
+                    color: #fff;
+                    position: relative;
+                    z-index: 222;
+                }
+                header > img { width: 45px; height: 40px; }
+                header nav {}
+                header nav > ul { 
+                    padding: 0px;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
+                }
+                header nav > ul li{ 
+                    margin: 0 10px;
+                    letter-spacing: 1px;
+                    cursor: pointer;
+                    transition: .4s;
+                    position: relative;
+                }
+                .active-chart { font-weight: 600 } 
+                .active-chart:before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    bottom: -3px;
+                    width: 100%;
+                    height: 1px;
+                    background-color: #fff;
+                }
+              `;
+            this._shadowRoot.appendChild(style);
         }
         static get observedAttributes () {
             return ['active-chart'];
@@ -5320,24 +5035,122 @@ customElements.define('app-header',
         attributeChangedCallback(name, oldValue, newValue) {
             switch (name) {
                 case 'active-chart':
+                    dispatchEvent(new CustomEvent("sendTab", {
+                        detail: newValue
+                    }));
                     console.log(`Value changed from ${oldValue} to ${newValue}`);
                     break;
             }
         }
         connectedCallback() {
-            this.setLogo(this._shadowRoot)
-            console.log(this.activeChart, _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["tabCharts"]);
+            this.__setLogo(this._header);
+            this.__drawTabs();
+            this._shadowRoot.appendChild(this._header);
         }
         get activeChart () {
             return this.getAttribute('active-chart')
         }
-        setLogo (ref) {
+        set activeChart (value) {
+            this.setAttribute('active-chart', value);
+        }
+
+        __drawTabs () {
+            const _nav = document.createElement("NAV");
+            _nav.innerHTML = '<ul type="none"></ul>';
+            _helpers_constants__WEBPACK_IMPORTED_MODULE_0__["tabCharts"].forEach(tab => {
+                const _navItem = document.createElement('LI');
+                _navItem.innerText = tab;
+                if (this.activeChart === tab) {
+                    _navItem.classList.add('active-chart')
+                }
+                _navItem.onclick = () => this.__changeChart(tab, _navItem);
+                _nav.querySelector('ul').appendChild(_navItem);
+            });
+            this._header.appendChild(_nav);
+        }
+
+        __setLogo (ref) {
             const _logo = document.createElement('IMG');
             _logo.src = './images/logo.png';
             ref.appendChild(_logo);
         }
+
+        __changeChart (tab, li) {
+            if (this._header.querySelector('.active-chart')) {
+                this._header.querySelector('.active-chart').classList.remove('active-chart');
+            }
+            li.classList.add('active-chart');
+            this.activeChart = tab;
+        }
     }
 );
+
+
+/***/ }),
+
+/***/ "./src/scripts/components/toggleGUI.js":
+/*!*********************************************!*\
+  !*** ./src/scripts/components/toggleGUI.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+customElements.define('toggle-gui',
+    class ToggleGUI extends HTMLElement {
+        constructor () {
+            super();
+            this._shadowRoot    = this.attachShadow({mode: 'open'});
+            this._button        = document.createElement('BUTTON');
+            const style         = document.createElement('style');
+            style.textContent = `
+                button {
+                    position: fixed;
+                    right: 0;
+                    background: #000;
+                    border: 0;
+                    color: #fff;
+                    font-size: 19px;
+                    padding: 5px;
+                    outline: none;
+                    cursor: pointer;
+                    transition: .4s;
+                }
+            `;
+            this._guiControl    = document.querySelector('.dg.ac');
+            this._shadowRoot.appendChild(style);
+            this._shadowRoot.innerHTML += '<link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">';
+        }
+        static get observedAttributes () {
+            return ['toggle-gui'];
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            switch (name) {
+                case 'toggle-gui':
+                    this._guiControl = document.querySelector('.dg.ac');
+                    this._button.innerHTML = newValue === 'close' ? '<span class="lnr lnr-cross"></span>' : '<span class="lnr lnr-menu"></span>';
+                    this._guiControl.style.right = this.toggleGuiAttr === 'open' ? '-245px' : '0';
+                    break;
+            }
+        }
+        connectedCallback () {
+            this._guiControl.style.opacity = '0';
+            this._guiControl.style.transitionProperty = 'opacity 0s';
+            this._button.onclick = () => this._toggleGUI();
+            this._shadowRoot.appendChild(this._button);
+        }
+        get toggleGuiAttr () {
+            return this.getAttribute('toggle-gui')
+        }
+        set toggleGuiAttr (value) {
+            this.setAttribute('toggle-gui', value);
+        }
+        _toggleGUI () {
+            this._guiControl.style.opacity = '1';
+            this.toggleGuiAttr = this.toggleGuiAttr === 'open' ? 'close' : 'open';
+            this._button.style.right = this.toggleGuiAttr === 'close' ? '245px' : '0';
+        }
+    });
 
 /***/ }),
 
@@ -5345,10 +5158,10 @@ customElements.define('app-header',
 /*!************************************!*\
   !*** ./src/scripts/dummyData.json ***!
   \************************************/
-/*! exports provided: line, bar, pie, polar, default */
+/*! exports provided: Line, Bar, Pie, Polar, default */
 /***/ (function(module) {
 
-module.exports = JSON.parse("{\"line\":{\"header\":\"List of continents by population in \",\"data\":{\"1950\":[{\"value\":228902000,\"text\":\"Africa\"},{\"value\":226719000,\"text\":\"N. America\"},{\"value\":113739000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":1394018000,\"text\":\"Asia\"},{\"value\":549089000,\"text\":\"Europa\"},{\"value\":12682000,\"text\":\"Australia\"}],\"1990\":[{\"value\":631614000,\"text\":\"Africa\"},{\"value\":429653000,\"text\":\"N. America\"},{\"value\":297869000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3202475000,\"text\":\"Asia\"},{\"value\":721086000,\"text\":\"Europa\"},{\"value\":26971000,\"text\":\"Australia\"}],\"2010\":[{\"value\":546867000,\"text\":\"Africa\"},{\"value\":578000000,\"text\":\"N. America\"},{\"value\":397085000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4169850000,\"text\":\"Asia\"},{\"value\":735395000,\"text\":\"Europa\"},{\"value\":36411000,\"text\":\"Australia\"}],\"2020\":[{\"value\":1275920972,\"text\":\"Africa\"},{\"value\":582931600,\"text\":\"N. America\"},{\"value\":423581078,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4560667108,\"text\":\"Asia\"},{\"value\":746419440,\"text\":\"Europa\"},{\"value\":39901000,\"text\":\"Australia\"}]}},\"bar\":{\"header\":\"List of highest mountains on Earth (m)\",\"data\":[{\"value\":8848,\"text\":\"Everest\"},{\"value\":8516,\"text\":\"Lhotse\"},{\"value\":8091,\"text\":\"Anapurna\"},{\"value\":8167,\"text\":\"Dhaulagiri\"},{\"value\":8188,\"text\":\"Cho Oyu\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8126,\"text\":\"Nanga Parbat\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8163,\"text\":\"Manaslu\"},{\"value\":8485,\"text\":\"Makalu\"}]},\"pie\":{\"header\":\"Mountains of Armenia (m)\",\"data\":[{\"value\":4090,\"text\":\"Aragats\"},{\"value\":3906,\"text\":\"Kaputjugh\"},{\"value\":3598,\"text\":\"Azhdahak\"},{\"value\":3594,\"text\":\"Tsxruk\"},{\"value\":3560,\"text\":\"Spitakasar\"},{\"value\":3520,\"text\":\"Vardenis\"},{\"value\":3552,\"text\":\"Mets Ishxanasar\"}]},\"polar\":{\"header\":\"Administrative divisions of Armenia (population)\",\"data\":[{\"value\":129800,\"text\":\"Aragatsotn\"},{\"value\":258900,\"text\":\"Ararat\"},{\"value\":266600,\"text\":\"Armavir\"},{\"value\":231800,\"text\":\"Gegharkunik\"},{\"value\":253900,\"text\":\"Kotayk\"},{\"value\":225000,\"text\":\"Lori\"},{\"value\":243200,\"text\":\"Shirak\"},{\"value\":139400,\"text\":\"Syunik\"},{\"value\":125500,\"text\":\"Tavush\"},{\"value\":50800,\"text\":\"Vayots Dzor\"}]}}");
+module.exports = JSON.parse("{\"Line\":{\"header\":\"List of continents by population in \",\"data\":{\"1950\":[{\"value\":228902000,\"text\":\"Africa\"},{\"value\":226719000,\"text\":\"N. America\"},{\"value\":113739000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":1394018000,\"text\":\"Asia\"},{\"value\":549089000,\"text\":\"Europa\"},{\"value\":12682000,\"text\":\"Australia\"}],\"1990\":[{\"value\":631614000,\"text\":\"Africa\"},{\"value\":429653000,\"text\":\"N. America\"},{\"value\":297869000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":3202475000,\"text\":\"Asia\"},{\"value\":721086000,\"text\":\"Europa\"},{\"value\":26971000,\"text\":\"Australia\"}],\"2010\":[{\"value\":546867000,\"text\":\"Africa\"},{\"value\":578000000,\"text\":\"N. America\"},{\"value\":397085000,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4169850000,\"text\":\"Asia\"},{\"value\":735395000,\"text\":\"Europa\"},{\"value\":36411000,\"text\":\"Australia\"}],\"2020\":[{\"value\":1275920972,\"text\":\"Africa\"},{\"value\":582931600,\"text\":\"N. America\"},{\"value\":423581078,\"text\":\"S. America\"},{\"value\":0,\"text\":\"Antarctica\"},{\"value\":4560667108,\"text\":\"Asia\"},{\"value\":746419440,\"text\":\"Europa\"},{\"value\":39901000,\"text\":\"Australia\"}]}},\"Bar\":{\"header\":\"List of highest mountains on Earth (m)\",\"data\":[{\"value\":8848,\"text\":\"Everest\"},{\"value\":8516,\"text\":\"Lhotse\"},{\"value\":8091,\"text\":\"Anapurna\"},{\"value\":8167,\"text\":\"Dhaulagiri\"},{\"value\":8188,\"text\":\"Cho Oyu\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8126,\"text\":\"Nanga Parbat\"},{\"value\":8611,\"text\":\"Chogori\"},{\"value\":8163,\"text\":\"Manaslu\"},{\"value\":8485,\"text\":\"Makalu\"}]},\"Pie\":{\"header\":\"Mountains of Armenia (m)\",\"data\":[{\"value\":1326093184,\"text\":\"India\"},{\"value\":336835520,\"text\":\"US\"},{\"value\":267532448,\"text\":\"Indonesia\"},{\"value\":222607504,\"text\":\"Brazil\"},{\"value\":213719472,\"text\":\"Pakistan\"},{\"value\":1384545280,\"text\":\"China\"},{\"value\":207698752,\"text\":\"Nigeria\"}]},\"Polar\":{\"header\":\"Administrative divisions of Armenia (population)\",\"data\":[{\"value\":129800,\"text\":\"Aragatsotn\"},{\"value\":258900,\"text\":\"Ararat\"},{\"value\":266600,\"text\":\"Armavir\"},{\"value\":231800,\"text\":\"Gegharkunik\"},{\"value\":253900,\"text\":\"Kotayk\"},{\"value\":50800,\"text\":\"Vayots Dzor\"},{\"value\":225000,\"text\":\"Lori\"},{\"value\":243200,\"text\":\"Shirak\"},{\"value\":139400,\"text\":\"Syunik\"},{\"value\":125500,\"text\":\"Tavush\"}]}}");
 
 /***/ }),
 
@@ -5363,6 +5176,356 @@ module.exports = JSON.parse("{\"line\":{\"header\":\"List of continents by popul
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tabCharts", function() { return tabCharts; });
 const tabCharts = ['Line', 'Bar', 'Pie', 'Polar'];
+
+/***/ }),
+
+/***/ "./src/scripts/index.js":
+/*!******************************!*\
+  !*** ./src/scripts/index.js ***!
+  \******************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _dummyData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dummyData */ "./src/scripts/dummyData.json");
+var _dummyData__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_require__.t(/*! ./dummyData */ "./src/scripts/dummyData.json", 1);
+/* harmony import */ var _Line_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Line.js */ "./src/scripts/Line.js");
+/* harmony import */ var _Bar_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Bar.js */ "./src/scripts/Bar.js");
+/* harmony import */ var _Pie_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Pie.js */ "./src/scripts/Pie.js");
+/* harmony import */ var _Polar_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Polar.js */ "./src/scripts/Polar.js");
+
+
+
+
+
+let canvas = document.querySelector('#chart');
+const canvasParent = canvas.parentElement;
+
+(async () => {
+    let type = 'Line';
+    let _legendInfo = {};
+    await addEventListener('sendTab', (data) => {
+        type = data.detail;
+        const new_element = canvas.cloneNode(true);
+        canvas.parentNode.replaceChild(new_element, canvas);
+        if (document.querySelector('.dg.ac')) {
+            document.querySelector('.main').remove()
+        }
+        canvas = new_element;
+        if (type === 'Line') {
+            _legendInfo = {
+                header: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].header,
+                info1: null,
+                info2: Object.keys(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data)[0],
+                keys: [...Object.keys(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data)]
+            };
+            new ChartArt(canvas).__init(Object(_Line_js__WEBPACK_IMPORTED_MODULE_1__["ParametersLine"])(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data, _legendInfo));
+        } else if (type === 'Bar') {
+            _legendInfo = {
+                header: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].header,
+                info1: null,
+                info2: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data,
+            };
+            new ChartArt(canvas).__init(Object(_Bar_js__WEBPACK_IMPORTED_MODULE_2__["ParametersBar"])(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data, _legendInfo));
+        } else if (type === 'Pie') {
+            _legendInfo = {
+                header: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].header,
+                info1: null,
+                info2: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data,
+            };
+            new ChartArt(canvas).__init(Object(_Pie_js__WEBPACK_IMPORTED_MODULE_3__["ParametersPie"])(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data));
+        } else if (type === 'Polar') {
+            _legendInfo = {
+                header: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].header,
+                info1: null,
+                info2: _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data,
+            };
+            new ChartArt(canvas).__init(Object(_Polar_js__WEBPACK_IMPORTED_MODULE_4__["ParametersPolar"])(_dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data));
+        }
+    });
+
+    function ChartArt (selector) {
+        const self              = this;
+        this._result            = null;
+        this._canvas            = selector.getContext('2d');
+        this._heightCanvas      = 500;
+        this._widthCanvas       = 800;
+
+        function Result (elem, options) {
+            if (options) {
+                if (type === 'Line') {
+                    this.line       = new _Line_js__WEBPACK_IMPORTED_MODULE_1__["Line"](options, canvas, self, _legendInfo);
+                    this.line.__initL();
+                } else if (type === 'Bar') {
+                    this.bar     = new _Bar_js__WEBPACK_IMPORTED_MODULE_2__["Bar"](options, canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    this.bar.__init();
+                } else if (type === 'Pie') {
+                    this.pie     = new _Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    this.pie.__init();
+                } else if (type === 'Polar') {
+                    this.polar   = new _Polar_js__WEBPACK_IMPORTED_MODULE_4__["Polar"](canvas, self, _legendInfo, _dummyData__WEBPACK_IMPORTED_MODULE_0__[type].data);
+                    Object.assign(this.polar.__proto__, _Pie_js__WEBPACK_IMPORTED_MODULE_3__["Pie"].prototype);
+                    this.polar.__initP();
+                }
+
+            }
+        }
+
+
+        /******************HELPERS***********/
+        this.constructor.__valuesIntegration = function(_values) {
+            const [min, max] = [Math.min(..._values), Math.max(..._values)];
+            if (max > 1000000) {
+                return [1000000, 'M'];
+            } else if (max > 10000 && max < 1000000) {
+                return [1000, 'K'];
+            } else {
+                return [null, null]
+            }
+        };
+        Result.prototype.__convertHex = function (hex,opacity){
+            let hexCode = hex.replace('#',''),
+            r = parseInt(hexCode.substring(0,2), 16),
+            g = parseInt(hexCode.substring(2,4), 16),
+            b = parseInt(hexCode.substring(4,6), 16);
+            const result = 'rgba('+r+','+g+','+b+','+opacity+')';
+            return result;
+        };
+        Result.prototype.__getRandomColor = function () {
+            return '#'+Math.random().toString(16).substr(2,6);
+        };
+        /*___For some color to change more lighter or darker ____*/
+        Result.prototype.__colorLuminance = function (hex, lum) {
+            // validate hex string
+            hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            if (hex.length < 6) {
+                hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            }
+            lum = lum || 0;
+            // convert to decimal and change luminosity
+            let rgb = "#", c, i;
+            for (i = 0; i < 3; i++) {
+                c = parseInt(hex.substr(i*2,2), 16);
+                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                rgb += ("00"+c).substr(c.length);
+            }
+            return rgb;
+        };
+        Result.prototype.__fittingString = function (c, str, maxWidth) {
+            let width = c.measureText(str).width;
+            let ellipsis = '…';
+            let ellipsisWidth = c.measureText(ellipsis).width;
+            if (width<=maxWidth || width<=ellipsisWidth) {
+                return str;
+            } else {
+                let len = str.length;
+                while (width>=maxWidth-ellipsisWidth && len-->0) {
+                    str = str.substring(0, len);
+                    width = c.measureText(str).width;
+                }
+                return str+ellipsis;
+            }
+        };
+        Result.prototype.__max_min_values = function (arr) {
+            let [max, min] = [Math.max(...arr.map(_ => _ instanceof Object ? _.value : _)),
+                Math.min(...arr.map(_ => _ instanceof Object ? _.value : _))]
+            return {
+                max, min
+            }
+        };
+        Result.prototype.__setHeader = function (text) {
+            if (canvasParent.querySelector('h1')) {
+                canvasParent.querySelector('h1').remove();
+            }
+            const label = document.createElement("H1");
+            label.innerText = text;
+            label.style.width = self._widthCanvas + 'px';
+            label.style.textAlign = 'center';
+            canvasParent.querySelector('canvas').insertAdjacentElement('beforeBegin', label)
+        };
+        this.constructor.__maxValue = function (nest, options) {
+            let res;
+            nest.nesting.forEach((_, index) => {
+                if (index < nest.nesting.length - 1){
+                    try {
+                        res = options[_]
+                        options = res
+                    } catch (err) {
+                        options = res
+                    }
+                } else {
+                    let _last = nest.nesting.pop()
+                    if (res && !res.hasOwnProperty(_)) {
+                        res[_] = nest.emptyProperty
+                    } else if (res instanceof Object) {
+                        options[_last] = (options[_last] > nest.value) ? nest.value : res[_last]
+                    }
+                }
+            })
+        }
+        /********** ONLY FOR TRANSPARENT COLOR************/
+        this.constructor.__drawLineColor = function (xMoveTo, yMoveTo, xLineTo, yLineTo, dataColor) {
+            const gradient = self._canvas.createLinearGradient(xMoveTo, yMoveTo, xLineTo, yLineTo);
+            let grow = 1 / (dataColor.length - 1);
+            dataColor.forEach((_, index)=> {
+                gradient.addColorStop( grow * index, _);
+            })
+            return gradient
+        };
+
+        this.constructor.__maxValueInit = function (options) {
+            self._canvas.clearRect(0, 0, self._widthCanvas, self._heightCanvas);
+            if (options.type === 'bar' || options.type === 'line') {
+                [{
+                    nesting: ['options', 'scales', 'axisColor'],
+                    value: 'rgb(85,72,72)',
+                    emptyProperty: 'rgb(85,72,72)'
+                }, {
+                    nesting: ['options', 'bars', 'mouseMove', 'tooltip'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['options', 'legend'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'fontSize'],
+                    value: 16,
+                    emptyProperty: 13
+                }, {
+                    nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'fontSize'],
+                    value: 16,
+                    emptyProperty: 13
+                }, {
+                    nesting: ['options', 'padding', 'paddingTop'],
+                    value: 40,
+                    emptyProperty: 10
+                }, {
+                    nesting: ['options', 'padding', 'paddingBottom'],
+                    value: 30,
+                    emptyProperty: 20
+                }, {
+                    nesting: ['options', 'padding', 'paddingLeft'],
+                    value: 50,
+                    emptyProperty: 10
+                }, {
+                    nesting: ['options', 'padding', 'paddingRight'],
+                    value: 50,
+                    emptyProperty: 10
+                }, {
+                    nesting: ['options', 'bars', 'width'],
+                    value: 60,
+                    emptyProperty: 40
+                }, {
+                    nesting: ['options', 'scales', 'yAxis', 'tricks', 'labels', 'display'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['options', 'scales', 'xAxis', 'tricks', 'labels', 'display'],
+                    value: true,
+                    emptyProperty: true
+                }].forEach(_ => self.constructor.__maxValue(_, options))
+            } else if (options.type === 'pie' || options.type === 'polar') {
+                [{
+                    nesting: ['data', 'datasets', 'legends', 'display'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['data', 'datasets', 'legends', 'position'],
+                    value: 'top',
+                    emptyProperty: 'top'
+                }, {
+                    nesting: ['options', 'onHover', 'tooltip'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['options', 'onHover', 'event'],
+                    value: true,
+                    emptyProperty: true
+                }, {
+                    nesting: ['options', 'lineWidth'],
+                    value: 3,
+                    emptyProperty: 0.1
+                }, {
+                    nesting: ['options', 'axisColor'],
+                    value: '#ccc',
+                    emptyProperty: '#ccc'
+                }].forEach(_ => self.constructor.__maxValue(_, options))
+            }
+        }
+        /*_________________________________*/
+
+        Result.prototype.__init = function (parameters) {
+            selector.width                = self._widthCanvas;
+            selector.height               = self._heightCanvas;
+            self.constructor.__maxValueInit(parameters); /* Set Default Max Values */
+
+            // For Bar Chart ~~~~~~~~~
+            self._bars                    = parameters.options.bars;
+            self._barsColors              = parameters.options.bars && parameters.options.bars.backgroundColors || { one: '#F21103', two: '#F86300', three: '#F7C601'};
+            self._barTooltip              = (parameters.options.bars && parameters.options.bars.mouseMove && parameters.options.bars.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.bars.mouseMove.tooltip : true;
+            self._paddingYLeft            = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
+            self._paddingXBottom          = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
+            self._paddingYRight           = parameters.options.padding && parameters.options.padding.paddingRight || 10;
+            self._paddingXTop             = parameters.options.padding && parameters.options.padding.paddingTop || 10;
+            self._lineYWidth              = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
+            self._lineXWidth              = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
+            self._borderColor             = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || '#000';
+            self._axisColor               = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
+            self._axisOpacity             = 1;
+            self._borderOpacity           = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
+            self._labelsX                 = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
+            self._labelsY                 = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
+            self._paddingXBottom          = self._labelsX.display ? self._paddingXBottom: 10;
+            self._paddingYLeft            = self._labelsY.display ? self._paddingYLeft + (50 - self._paddingYLeft): 10;
+            //~~~~~~~~~~~~~~~~~~~~~~
+
+            // For Pie Chart ~~~~~~~~~~~~~~~~~~~
+            self._lineWidth_pie           = parameters.options.lineWidth || 0.1;
+            self._onHover_pie             = parameters.options.onHover && parameters.options.onHover.event;
+            self._tooltip_pie             = parameters.options.onHover && parameters.options.onHover.tooltip;
+            self._legends_pie             = parameters.data.datasets.legends;
+            self._legends_position_pie    = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
+            //~~~~~~~~~~~~~~~~~~~~~~
+
+            // For Polar Chart ~~~~~~~~~~~~~~~~~
+            self._colorAxis_polar         = parameters.options.axisColor || '#ccc';
+            self._lineWidth_polar         = parameters.options.lineWidth || 0.1;
+            self._onHover_polar           = parameters.options.onHover && parameters.options.onHover.event;
+            self._tooltip_polar           = parameters.options.onHover && parameters.options.onHover.tooltip;
+            self._legends_polar           = parameters.data.datasets.legends;
+            self._legends_position_polar  = parameters.data.datasets.legends && parameters.data.datasets.legends.position;
+            // ~~~~~~~~~~~~~~~~~~~~~
+
+            // For Line Chart ~~~~~~~~~~~~~~~~~~~~~~~
+            self._pointTooltip            = (parameters.options.points && parameters.options.points.mouseMove && parameters.options.points.mouseMove.hasOwnProperty('tooltip')) ? parameters.options.points.mouseMove.tooltip : true;
+            self._legendLine              = parameters.options.legend;
+            self._paddingYLeftLine        = parameters.options.padding && parameters.options.padding.paddingLeft || 10;
+            self._paddingXBottomLine      = parameters.options.padding && parameters.options.padding.paddingBottom || 10;
+            self._paddingYRightLine       = parameters.options.padding && parameters.options.padding.paddingRight || 10;
+            self._paddingXTopLine         = parameters.options.padding && parameters.options.padding.paddingTop || 10;
+            self._lineYWidthLine          = parameters.options.scales && parameters.options.scales.yAxis.lineWidth || null;
+            self._lineXWidthLine          = parameters.options.scales && parameters.options.scales.xAxis.lineWidth || null;
+            self._borderColorLine         = parameters.data.datasets.borderColor && parameters.data.datasets.borderColor || [227, 225, 225];
+            self._axisColorLine           = parameters.options.scales && parameters.options.scales.axisColor || 'rgb(85,72,72)';
+            self._axisOpacityLine         = 1;
+            self._lineColors              = parameters.options.lineColors || [];
+            self._borderOpacityLine       = parameters.data.datasets.borderOpacity && parameters.data.datasets.borderOpacity || 1;
+            self._labelsXLine             = (parameters.options.scales && parameters.options.scales.xAxis && parameters.options.scales.xAxis.tricks) && parameters.options.scales.xAxis.tricks.labels || {};
+            self._labelsYLine             = (parameters.options.scales && parameters.options.scales.yAxis && parameters.options.scales.yAxis.tricks) && parameters.options.scales.yAxis.tricks.labels || {};
+            self._paddingXBottomLine      = self._labelsXLine.display ? self._paddingXBottomLine: 10;
+            self._paddingYLeftLine        = self._labelsYLine.display ? self._paddingYLeftLine + (50 - self._paddingYLeftLine): 10;
+            self._lineWidth               = parameters.options.lineWidth || 1;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            self._result = new Result(selector, parameters);
+
+            return self._result[parameters.type]
+        };
+        return new Result(selector)
+    }
+
+})();
 
 /***/ }),
 
@@ -5394,13 +5557,12 @@ if (content.locals) {
 /***/ }),
 
 /***/ 0:
-/*!************************************************************!*\
-  !*** multi ./src/index.js ./src/scripts/components/app.js ***!
-  \************************************************************/
+/*!*********************************************!*\
+  !*** multi ./src/scripts/components/app.js ***!
+  \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! ./src/index.js */"./src/index.js");
 module.exports = __webpack_require__(/*! ./src/scripts/components/app.js */"./src/scripts/components/app.js");
 
 
