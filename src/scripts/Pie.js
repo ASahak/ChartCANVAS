@@ -29,6 +29,7 @@ export function Pie (canvas, self, _legendInfo, dataChart) {
     this._labelsPosition = [];
     this._prevId         = null;
     this._prevColor      = null;
+
     const _pieFolder     = this._gui.addFolder('Pie');
     _pieFolder.add(self, '_lineWidth_pie', 0.1, 3).name('Space of Pies')
         .onChange(() => {
@@ -100,7 +101,6 @@ export function Pie (canvas, self, _legendInfo, dataChart) {
                 _class.__draw()
             })
         });
-    _pieFolder.open();
 }
 Pie.prototype.__findPointOnCircle = function (originX, originY , radius, angleRadians) {
     const destX = radius * Math.cos(angleRadians) + originX;

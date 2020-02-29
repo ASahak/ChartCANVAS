@@ -1,8 +1,28 @@
 body {
+    font-family: 'Roboto Condensed';
     margin: 0;
+    background: #e1f6ff;
+}
+.dg.ac{
+    transition: 0s;
+    transition-property: right;
+    transition-duration: .4s;
+    top: 70px !important;
+}
+.dg .main {
+    margin-right: 0;
+ }
+.container {
+    display: flex;
+    justify-content: center;
+}
+#canvas-parent {
+    display: inline-block;
 }
 #chart{
-    border:1px solid #000;
+    border: 1px solid #d9d9d9;
+    border-radius: 7px;
+    background-color: #fff;
 }
 /*~~~~~~~~~~ BAR CHARTART ~~~~~~~~~~*/
 .tooltip-element-bar {
