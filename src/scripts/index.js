@@ -59,16 +59,16 @@ const canvasParent = canvas.parentElement;
         function Result (elem, options) {
             if (options) {
                 if (type === 'Line') {
-                    this.line       = new Line(options, canvas, self, _legendInfo);
+                    this.line = new Line(options, canvas, self, _legendInfo);
                     this.line.__initL();
                 } else if (type === 'Bar') {
-                    this.bar     = new Bar(options, canvas, self, _legendInfo, dummyData[type].data);
+                    this.bar = new Bar(options, canvas, self, _legendInfo, dummyData[type].data);
                     this.bar.__init();
                 } else if (type === 'Pie') {
-                    this.pie     = new Pie(canvas, self, _legendInfo, dummyData[type].data);
+                    this.pie = new Pie(canvas, self, _legendInfo, dummyData[type].data);
                     this.pie.__init();
                 } else if (type === 'Polar') {
-                    this.polar   = new Polar(canvas, self, _legendInfo, dummyData[type].data);
+                    this.polar = new Polar(canvas, self, _legendInfo, dummyData[type].data);
                     Object.assign(this.polar.__proto__, Pie.prototype);
                     this.polar.__initP();
                 }

@@ -5,7 +5,7 @@ export function Pie (canvas, self, _legendInfo, dataChart) {
     this._dataChart      = dataChart;
     this._legendInfo     = _legendInfo;
     this._self           = self;
-    this._gui            = new dat.GUI();
+    this._gui            = new dat.GUI({resizable : false});
     this._values         = [];
     this._radius         = 150;
     this._colors         = [];

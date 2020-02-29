@@ -4,7 +4,7 @@ export function Line (options, canvas, self, _legendInfo) {
     this._canvasElement   = canvas;
     this._legendInfo      = _legendInfo;
     this._self            = self;
-    this._gui             = new dat.GUI();
+    this._gui             = new dat.GUI({resizable : false});
     const lineFolder      = this._gui.addFolder('Line');
     this._configuration   = options;
     this._data            = this._configuration.data.datasets.data;
